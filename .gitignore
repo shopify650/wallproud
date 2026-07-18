@@ -43,3 +43,6 @@ next-env.d.ts
 # custom ignores
 dev-server.log
 temp.txt
+
+.vercel
+.env*
