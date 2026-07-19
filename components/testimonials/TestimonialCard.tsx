@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { Trash2, Copy, Sparkles, Pencil, Star, MoreHorizontal } from "lucide-react";
 import toast from "react-hot-toast";
 import { toggleFeatured, deleteTestimonial } from "@/app/actions/testimonials";
@@ -35,7 +35,7 @@ function StarRating({ rating }: { rating: number | null }) {
   );
 }
 
-export default function TestimonialCard({
+export default memo(function TestimonialCard({
   testimonial,
   onRefresh,
   selected,
@@ -148,4 +148,4 @@ export default function TestimonialCard({
       {editOpen && <AddTestimonialModal open={editOpen} onClose={() => setEditOpen(false)} onSuccess={onRefresh} editTestimonial={testimonial} />}
     </>
   );
-}
+});

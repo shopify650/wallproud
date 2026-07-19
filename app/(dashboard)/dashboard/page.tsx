@@ -119,53 +119,26 @@ async function DashboardContent() {
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
-
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .limit(1)
-    .single();
+  const { profile, workspace } = await getDashboardData(authUser.id);
 
   if (!profile || !workspace) redirect("/login");
 
   const now = new Date();
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-  const { count: totalTestimonials } = await supabase
-    .from("testimonials")
-    .select("*", { count: "exact", head: true })
-    .eq("workspace_id", workspace.id);
+  const [totalTestimonialsResult, thisMonthTestimonialsResult, totalWidgetsResult, recentTestimonialsResult, totalViewsResult] = await Promise.all([
+    supabase.from("testimonials").select("*", { count: "exact", head: true }).eq("workspace_id", workspace.id),
+    supabase.from("testimonials").select("*", { count: "exact", head: true }).eq("workspace_id", workspace.id).gte("created_at", firstOfMonth),
+    supabase.from("widgets").select("*", { count: "exact", head: true }).eq("workspace_id", workspace.id),
+    supabase.from("testimonials").select("*").eq("workspace_id", workspace.id).eq("status", "approved").order("created_at", { ascending: false }).limit(5),
+    supabase.from("widgets").select("views_count").eq("workspace_id", workspace.id),
+  ]);
 
-  const { count: thisMonthTestimonials } = await supabase
-    .from("testimonials")
-    .select("*", { count: "exact", head: true })
-    .eq("workspace_id", workspace.id)
-    .gte("created_at", firstOfMonth);
-
-  const { count: totalWidgets } = await supabase
-    .from("widgets")
-    .select("*", { count: "exact", head: true })
-    .eq("workspace_id", workspace.id);
-
-  const { data: recentTestimonials } = await supabase
-    .from("testimonials")
-    .select("*")
-    .eq("workspace_id", workspace.id)
-    .eq("status", "approved")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const totalViews = (await supabase
-    .from("widgets")
-    .select("views_count")
-    .eq("workspace_id", workspace.id))
-    .data?.reduce((sum, w) => sum + (w.views_count || 0), 0) || 0;
+  const totalTestimonials = totalTestimonialsResult.count || 0;
+  const thisMonthTestimonials = thisMonthTestimonialsResult.count || 0;
+  const totalWidgets = totalWidgetsResult.count || 0;
+  const recentTestimonials = recentTestimonialsResult.data;
+  const totalViews = totalViewsResult.data?.reduce((sum, w) => sum + (w.views_count || 0), 0) || 0;
 
   const firstName = profile.full_name?.split(" ")[0] || "there";
 

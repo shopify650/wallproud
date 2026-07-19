@@ -2,11 +2,13 @@
 
 import { Monitor, Tablet, Smartphone } from "lucide-react";
 import type { WidgetConfig, WidgetType } from "@/types";
-import GridPreview from "./GridPreview";
-import CarouselPreview from "./CarouselPreview";
-import WallOfLovePreview from "./WallOfLovePreview";
-import SliderPreview from "./SliderPreview";
-import MinimalPreview from "./MinimalPreview";
+import dynamic from "next/dynamic";
+
+const GridPreview = dynamic(() => import("./GridPreview"));
+const CarouselPreview = dynamic(() => import("./CarouselPreview"));
+const WallOfLovePreview = dynamic(() => import("./WallOfLovePreview"));
+const SliderPreview = dynamic(() => import("./SliderPreview"));
+const MinimalPreview = dynamic(() => import("./MinimalPreview"));
 
 const previews: Record<WidgetType, React.ComponentType<{ config: WidgetConfig; testimonials: any[] }>> = {
   grid: GridPreview,

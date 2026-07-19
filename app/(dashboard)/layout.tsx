@@ -18,9 +18,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  let profile = (
-    await supabase.from("users").select("*").eq("id", authUser.id).single()
-  ).data;
+  const [profileResult, workspaceResult] = await Promise.all([
+    supabase.from("users").select("*").eq("id", authUser.id).single(),
+    supabase.from("workspaces").select("*").eq("user_id", authUser.id).limit(1).single(),
+  ]);
+
+  let profile = profileResult.data;
 
   if (!profile) {
     const { data: newProfile } = await supabase
@@ -43,12 +46,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .limit(1)
-    .single();
+  const workspace = workspaceResult.data;
 
   return (
     <div className="flex min-h-screen bg-canvas">
