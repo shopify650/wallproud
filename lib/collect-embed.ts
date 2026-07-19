@@ -168,9 +168,9 @@ ${isPopup ? `var bd=document.createElement('div');bd.className='wp-backdrop';doc
 
 ${w.display_type === 'floating' ? `
 if(tb)tb.addEventListener('click',function(){pn.classList.toggle('open')});
-` : isInline ? '' : `pn.classList.add('open');`+(isPopup ? 'bd.classList.add("open");' : '')}
+` : w.display_type === 'inline' ? '' : `pn.classList.add('open');`+(isPopup ? 'bd.classList.add("open");' : '')}
 
-sh.getElementById('cb').addEventListener('click',function(){if(!isInline){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}});
+sh.getElementById('cb').addEventListener('click',function(){if(w.display_type !== 'inline'){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}});
 
 ${w.show_star_rating ? `
 var st=sh.getElementById('st');
@@ -221,7 +221,7 @@ for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl
 var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
 cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
 ` : ''}
-setTimeout(function(){if(!isInline){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}},AC*1000);
+setTimeout(function(){if(w.display_type !== 'inline'){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}},AC*1000);
 }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
 }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
 });
