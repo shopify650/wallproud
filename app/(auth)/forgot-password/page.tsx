@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
     // is stored in the browser (localStorage), not on the server.
     const supabase = createClient();
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/update-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
     });
 
     setLoading(false);

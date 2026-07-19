@@ -1,45 +1,21 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock, ArrowRight, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updatePassword } from "@/app/actions/auth";
-import { createClient } from "@/lib/supabase/client";
+import { Suspense } from "react";
 
 function UpdatePasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [exchanging, setExchanging] = useState(true);
   const [error, setError] = useState("");
-  const [sessionReady, setSessionReady] = useState(false);
 
-  // Exchange the code from the URL for a real session
-  useEffect(() => {
-    const code = searchParams.get("code");
-
-    async function exchange() {
-      if (!code) {
-        setError("Invalid or expired reset link. Please request a new one.");
-        setExchanging(false);
-        return;
-      }
-
-      const supabase = createClient();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (error) {
-        setError("This reset link has expired or already been used. Please request a new one.");
-      } else {
-        setSessionReady(true);
-      }
-      setExchanging(false);
-    }
-
-    exchange();
-  }, [searchParams]);
+  // Show error if redirected back from callback with error flag
+  const linkError = searchParams.get("error");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -87,31 +63,17 @@ function UpdatePasswordForm() {
             Choose a new password for your account.
           </p>
 
-          {/* Loading state while exchanging code */}
-          {exchanging && (
-            <div className="mt-6 flex items-center gap-3 font-body-sm text-muted">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Verifying reset link...
-            </div>
-          )}
-
-          {/* Error state (expired/invalid link) */}
-          {!exchanging && !sessionReady && (
+          {/* Invalid/expired link */}
+          {linkError ? (
             <div className="mt-6 space-y-4">
               <div className="rounded-md bg-surface-1 px-3 py-2 font-body-sm text-muted">
-                {error}
+                This reset link has expired or already been used. Please request a new one.
               </div>
-              <Link
-                href="/forgot-password"
-                className="btn-primary w-full justify-center"
-              >
+              <Link href="/forgot-password" className="btn-primary w-full justify-center">
                 Request a new link
               </Link>
             </div>
-          )}
-
-          {/* Password form — only shown once session is ready */}
-          {!exchanging && sessionReady && (
+          ) : (
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div>
                 <label htmlFor="password" className="font-body-sm block text-ink">
@@ -185,14 +147,12 @@ function UpdatePasswordForm() {
 
 export default function UpdatePasswordPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center gap-3 font-body-sm text-muted">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={
+      <div className="flex items-center gap-3 font-body-sm text-muted">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading...
+      </div>
+    }>
       <UpdatePasswordForm />
     </Suspense>
   );
