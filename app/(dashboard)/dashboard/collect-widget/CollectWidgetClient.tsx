@@ -130,7 +130,6 @@ export default function CollectWidgetClient({
   const [tab, setTab] = useState<"settings" | "embed">("settings");
   const [domainInput, setDomainInput] = useState("");
   const [copied, setCopied] = useState(false);
-  const [embedFormat, setEmbedFormat] = useState<"script" | "framer">("script");
 
   const selectedWidget = widgets.find((w) => w.id === selectedId);
 
@@ -190,79 +189,21 @@ export default function CollectWidgetClient({
     if (!id) return toast.error("Save the widget first");
     
     const scriptCode = `<script src="${origin}/collect-widget/${id}.js" async></script>`;
-    const framerCode = `import * as React from "react"
-import { addPropertyControls, ControlType } from "framer"
 
-export default function WallproudCollectWidget(props) {
-    const containerRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (!containerRef.current || !props.widgetId) return
-
-        containerRef.current.innerHTML = ""
-
-        const script = document.createElement("script")
-        script.src = \`${origin}/collect-widget/\${props.widgetId}.js?t=\${Date.now()}\`
-        script.async = true
-        containerRef.current.appendChild(script)
-    }, [props.widgetId])
-
-    return <div ref={containerRef} style={{ ...props.style, width: "100%", height: "100%", display: "block" }} />
-}
-
-addPropertyControls(WallproudCollectWidget, {
-    widgetId: {
-        title: "Widget ID",
-        type: ControlType.String,
-        defaultValue: "${id}",
-    }
-})`;
-
-    const code = embedFormat === "framer" ? framerCode : scriptCode;
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(scriptCode);
       setCopied(true);
-      toast.success(embedFormat === "framer" ? "Framer component copied" : "Embed code copied");
+      toast.success("Embed code copied");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Could not copy");
     }
-  }, [form.id, selectedId, embedFormat]);
+  }, [form.id, selectedId]);
 
   const getEmbedCode = () => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const id = form.id || selectedId;
     if (!id) return "";
-    
-    if (embedFormat === "framer") {
-      return `import * as React from "react"
-import { addPropertyControls, ControlType } from "framer"
-
-export default function WallproudCollectWidget(props) {
-    const containerRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (!containerRef.current || !props.widgetId) return
-
-        containerRef.current.innerHTML = ""
-
-        const script = document.createElement("script")
-        script.src = \`${origin}/collect-widget/\${props.widgetId}.js?t=\${Date.now()}\`
-        script.async = true
-        containerRef.current.appendChild(script)
-    }, [props.widgetId])
-
-    return <div ref={containerRef} style={{ ...props.style, width: "100%", height: "100%", display: "block" }} />
-}
-
-addPropertyControls(WallproudCollectWidget, {
-    widgetId: {
-        title: "Widget ID",
-        type: ControlType.String,
-        defaultValue: "${id}",
-    }
-})`;
-    }
     return `<script src="${origin}/collect-widget/${id}.js" async></script>`;
   };
 
@@ -668,24 +609,6 @@ addPropertyControls(WallproudCollectWidget, {
             </p>
             {form.id || selectedId ? (
               <div className="mt-4 space-y-4">
-                <div className="flex rounded-lg border border-hairline w-fit">
-                  <button
-                    onClick={() => setEmbedFormat("script")}
-                    className={`px-4 py-1.5 font-body-sm transition-colors ${
-                      embedFormat === "script" ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    HTML Script
-                  </button>
-                  <button
-                    onClick={() => setEmbedFormat("framer")}
-                    className={`px-4 py-1.5 font-body-sm transition-colors ${
-                      embedFormat === "framer" ? "bg-surface-2 text-ink" : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    Framer Component
-                  </button>
-                </div>
                 <div className="relative">
                   <pre className="overflow-x-auto rounded-lg bg-surface-1 p-4 font-mono text-sm text-ink max-h-[350px]">
                     {getEmbedCode()}
