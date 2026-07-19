@@ -47,7 +47,7 @@ var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
 var c=document.createElement('div');
 c.id=cid;
-c.style.cssText='position:fixed;bottom:0;${posCSS};z-index:99999;pointer-events:none';
+c.style.cssText='position:fixed;inset:0;z-index:99999;pointer-events:none';
 var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
