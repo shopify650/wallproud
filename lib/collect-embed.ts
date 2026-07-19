@@ -47,7 +47,6 @@ var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
 var c=document.createElement('div');
 c.id=cid;
-c.style.cssText='position:fixed;bottom:24px;'+posCSS+';z-index:99999;pointer-events:none';
 var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
@@ -99,12 +98,19 @@ sh.innerHTML='<style>'
 +'<div class="wp-succ" id="sc"><div class="wp-succ-ic">🎉</div><h3>'+TY+'</h3><p>Your feedback means a lot to us.</p></div>'
 +'<div class="wp-ft"><span id="pw" style="display:'+(PB?'block':'none')+'"><a href="https://wallproud.com" target="_blank">Powered by WallProud</a></span></div>'
 +'</div>'
-+${DT==='floating' ? `':'<button class="wp-btn" id="tb" style="position:absolute;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${W};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto">💬</button>' : `:'</div>'};
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
 document.body.appendChild(c);
 
-${DT==='floating' ? `var tb=c.querySelector('#tb');` : ''}
+${DT==='floating' ? `
+var tb=document.createElement('button');
+tb.id='tb';
+tb.textContent='💬';
+tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${W};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s';
+tb.addEventListener('mouseenter',function(){this.style.transform='scale(1.1)'});
+tb.addEventListener('mouseleave',function(){this.style.transform='scale(1)'});
+document.body.appendChild(tb);
+` : ''}
 
 var pn=sh.getElementById('pn');
 var fm=sh.getElementById('fm');
