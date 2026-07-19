@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { resetPassword } from "@/app/actions/auth";
 
@@ -70,18 +70,15 @@ export default function ForgotPasswordPage() {
                 <label htmlFor="email" className="font-body-sm block text-ink">
                   Email
                 </label>
-                <div className="relative mt-1">
-                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-                  <input
+                <input
                     id="email"
                     name="email"
                     type="email"
                     autoComplete="email"
                     required
-                    className="input-field mt-0 pl-10"
+                    className="input-field mt-1"
                     placeholder="you@example.com"
                   />
-                </div>
               </div>
 
               {error && (
