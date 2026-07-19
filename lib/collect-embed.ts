@@ -147,7 +147,11 @@ sh.innerHTML='<style>'
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
 var cParent=isInline ? (s && s.parentNode && s.parentNode !== document.head ? s.parentNode : document.body) : ((document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body);
-cParent.appendChild(c);
+if(s && s.parentNode && isInline){
+  s.parentNode.insertBefore(c, s.nextSibling);
+}else{
+  cParent.appendChild(c);
+}
 
 ${w.display_type === 'floating' ? `
 var tb=document.createElement('button');
