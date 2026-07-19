@@ -101,7 +101,7 @@ sh.innerHTML='<style>'
 +'<div class="wp-succ" id="sc"><div class="wp-succ-ic">🎉</div><h3>'+TY+'</h3><p>Your feedback means a lot to us.</p></div>'
 +'<div class="wp-ft"><span id="pw" style="display:'+(PB?'block':'none')+'"><a href="https://wallproud.com" target="_blank">Powered by WallProud</a></span></div>'
 +'</div>'
-+(DT==='floating'?'<button class="wp-btn" id="tb">💬</button>':'');
++(DT==='floating'?'<button class="wp-btn" id="tb" style="position:absolute;bottom:24px;'+posCSS+';width:56px;height:56px;border-radius:50%;background:'+W+';color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto">💬</button>':'');
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
 var p = s && s.parentNode && s.parentNode !== document.head ? s.parentNode : document.body;
