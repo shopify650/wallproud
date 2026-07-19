@@ -107,7 +107,7 @@ ${w.display_type === 'floating' ? `
 var tb=document.createElement('button');
 tb.id='tb';
 tb.textContent='💬';
-tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${W};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s';
+tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${w.primary_color};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s';
 tb.addEventListener('mouseenter',function(){this.style.transform='scale(1.1)'});
 tb.addEventListener('mouseleave',function(){this.style.transform='scale(1)'});
 document.body.appendChild(tb);
