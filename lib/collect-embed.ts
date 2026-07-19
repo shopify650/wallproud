@@ -101,16 +101,18 @@ sh.innerHTML='<style>'
 +'</div>'
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
-document.body.appendChild(c);
+var cParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
+cParent.appendChild(c);
 
 ${w.display_type === 'floating' ? `
 var tb=document.createElement('button');
 tb.id='tb';
 tb.textContent='💬';
-tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${w.primary_color};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s';
+tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${w.primary_color};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto';
 tb.addEventListener('mouseenter',function(){this.style.transform='scale(1.1)'});
 tb.addEventListener('mouseleave',function(){this.style.transform='scale(1)'});
-document.body.appendChild(tb);
+var tbParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
+tbParent.appendChild(tb);
 ` : ''}
 
 var pn=sh.getElementById('pn');
@@ -169,7 +171,8 @@ ${w.show_confetti ? `
 var cf=document.createElement('div');cf.className='cfetti';
 var cl=['#6366f1','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
 for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}
-document.body.appendChild(cf);setTimeout(function(){cf.remove()},2500);
+var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
+cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
 ` : ''}
 setTimeout(function(){pn.classList.remove('open')},AC*1000);
 }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
