@@ -13,6 +13,7 @@ import {
   Link2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getDashboardData } from "@/lib/dashboard-data";
 import { DashboardSkeleton } from "@/components/dashboard/SkeletonLoader";
 import PlanBadge from "@/components/dashboard/PlanBadge";
 
