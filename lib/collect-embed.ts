@@ -47,14 +47,12 @@ var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
 var c=document.createElement('div');
 c.id=cid;
-c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none';
+c.style.cssText='position:fixed;bottom:24px;'+posCSS+';z-index:99999;pointer-events:none';
 var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
 +'*{box-sizing:border-box}'
-+'.wp-btn{position:absolute;bottom:24px;'+posCSS+';width:56px;height:56px;border-radius:50%;background:'+W+';color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto}'
-+'.wp-btn:hover{transform:scale(1.1)}'
-+'.wp-panel{position:absolute;bottom:90px;'+posCSS+';width:380px;max-height:80vh;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:99999;overflow:hidden;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;display:flex;flex-direction:column}'
++'.wp-panel{position:fixed;bottom:90px;'+posCSS+';width:380px;max-height:80vh;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:99999;overflow:hidden;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;display:flex;flex-direction:column}'
 +'.wp-panel.open{transform:translateY(0);opacity:1;pointer-events:all}'
 +'.wp-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}'
 +'.wp-hdr h3{font-size:18px;font-weight:700;color:#111}'
@@ -101,18 +99,19 @@ sh.innerHTML='<style>'
 +'<div class="wp-succ" id="sc"><div class="wp-succ-ic">🎉</div><h3>'+TY+'</h3><p>Your feedback means a lot to us.</p></div>'
 +'<div class="wp-ft"><span id="pw" style="display:'+(PB?'block':'none')+'"><a href="https://wallproud.com" target="_blank">Powered by WallProud</a></span></div>'
 +'</div>'
-+(DT==='floating'?'<button class="wp-btn" id="tb" style="position:absolute;bottom:24px;'+posCSS+';width:56px;height:56px;border-radius:50%;background:'+W+';color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto">💬</button>':'');
++${DT==='floating' ? `':'<button class="wp-btn" id="tb" style="position:absolute;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${W};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto">💬</button>' : `:'</div>'};
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
 document.body.appendChild(c);
+
+${DT==='floating' ? `var tb=c.querySelector('#tb');` : ''}
 
 var pn=sh.getElementById('pn');
 var fm=sh.getElementById('fm');
 var rg=0;
 
 ${w.display_type === 'floating' ? `
-var tb=sh.getElementById('tb');
-tb.addEventListener('click',function(){pn.classList.toggle('open')});
+if(tb)tb.addEventListener('click',function(){pn.classList.toggle('open')});
 ` : `pn.classList.add('open');`}
 
 sh.getElementById('cb').addEventListener('click',function(){pn.classList.remove('open')});
