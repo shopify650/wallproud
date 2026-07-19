@@ -37,72 +37,80 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="w-full max-w-sm flex-1 lg:max-w-md">
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg shadow-gray-100">
-        <h2 className="text-2xl font-bold text-gray-900">Reset password</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          {sent
-            ? "Check your inbox for a link to set a new password."
-            : "Enter your email and we'll send you a reset link."}
+    <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:gap-16">
+      <div className="hidden flex-1 lg:block">
+        <h1 className="font-display-xxl text-ink">
+          Reset your
+          <br />
+          password
+        </h1>
+        <p className="font-body-lg mt-6 max-w-sm text-muted">
+          Enter your email address and we&apos;ll send you a secure link to set
+          a new password.
         </p>
+      </div>
 
-        {sent ? (
-          <div className="mt-6 flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            <CheckCircle2 className="h-5 w-5" />
-            We&apos;ve emailed you a password reset link.
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <div className="relative mt-1">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  placeholder="you@example.com"
-                />
-              </div>
+      <div className="w-full max-w-sm">
+        <div className="card-hairline p-8">
+          <h2 className="font-display-md text-ink">Reset password</h2>
+          <p className="font-body-sm mt-1 text-muted">
+            {sent
+              ? "Check your inbox for a link to set a new password."
+              : "Enter your email and we'll send you a reset link."}
+          </p>
+
+          {sent ? (
+            <div className="mt-6 flex items-center gap-3 rounded-lg bg-surface-1 px-4 py-3 font-body-sm text-muted">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-accent" />
+              We&apos;ve emailed you a password reset link. Check your inbox.
             </div>
-
-            {error && (
-              <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-                {error}
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div>
+                <label htmlFor="email" className="font-body-sm block text-ink">
+                  Email
+                </label>
+                <div className="relative mt-1">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="input-field mt-0 pl-10"
+                    placeholder="you@example.com"
+                  />
+                </div>
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
+              {error && (
+                <div className="rounded-md bg-surface-1 px-3 py-2 font-body-sm text-muted">
+                  {error}
+                </div>
               )}
-              {loading ? "Sending..." : "Send reset link"}
-            </button>
-          </form>
-        )}
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          <Link
-            href="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Back to sign in
-          </Link>
-        </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full justify-center"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowRight className="h-4 w-4" />
+                )}
+                {loading ? "Sending..." : "Send reset link"}
+              </button>
+            </form>
+          )}
+
+          <p className="mt-6 text-center font-body-sm text-muted">
+            <Link href="/login" className="font-medium text-ink hover:text-muted">
+              Back to sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
