@@ -16,7 +16,6 @@ export function generateCollectEmbedScript(
   const panelPosCSS = isPopup
     ? "top:50%;left:50%;transform:translate(-50%,-50%)"
     : "bottom:90px;" + posCSS;
-  const panelDefaultTransform = isPopup ? "" : "transform:translateY(20px)";
 
   return `(function(){
 'use strict';
