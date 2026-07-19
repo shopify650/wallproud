@@ -102,7 +102,7 @@ sh.innerHTML='<style>'
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
 document.body.appendChild(c);
 
-${DT==='floating' ? `
+${w.display_type === 'floating' ? `
 var tb=document.createElement('button');
 tb.id='tb';
 tb.textContent='💬';
