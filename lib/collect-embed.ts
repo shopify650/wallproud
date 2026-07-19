@@ -12,6 +12,11 @@ export function generateCollectEmbedScript(
   const w = widget;
 
   const posCSS = w.position === "bottom-left" ? "left:24px" : "right:24px";
+  const isPopup = w.display_type === "popup";
+  const panelPosCSS = isPopup
+    ? "top:50%;left:50%;transform:translate(-50%,-50%)"
+    : "bottom:90px;" + posCSS;
+  const panelDefaultTransform = isPopup ? "" : "transform:translateY(20px)";
 
   return `(function(){
 'use strict';
@@ -52,8 +57,8 @@ var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
 +'*{box-sizing:border-box}'
-+'.wp-panel{position:absolute;bottom:90px;'+posCSS+';width:380px;max-height:80vh;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:99999;overflow:hidden;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;display:flex;flex-direction:column}'
-+'.wp-panel.open{transform:translateY(0);opacity:1;pointer-events:all}'
++'.wp-panel{position:absolute;'+panelPosCSS+';width:380px;max-height:80vh;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:99999;overflow:hidden;'+(isPopup ? 'opacity:0;transition:opacity 0.3s;pointer-events:none;' : 'transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;')+'display:flex;flex-direction:column}'
++'.wp-panel.open{opacity:1;pointer-events:all'+(isPopup ? '' : ';transform:translateY(0)')+'}'
 +'.wp-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}'
 +'.wp-hdr h3{font-size:18px;font-weight:700;color:#111}'
 +'.wp-close{width:32px;height:32px;border-radius:50%;border:none;background:#f3f4f6;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#6b7280}'
