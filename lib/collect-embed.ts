@@ -11,11 +11,13 @@ export function generateCollectEmbedScript(
   const origin = baseUrl || "https://wallproud.com";
   const w = widget;
 
-  const posCSS = w.position === "bottom-left" ? "left:24px" : "right:24px";
+  const posCSS = w.position === "bottom-left" ? "left:24px" : w.position === "bottom-center" ? "left:50%;transform:translateX(-50%)" : "right:24px";
   const isPopup = w.display_type === "popup";
   const panelPosCSS = isPopup
     ? "top:50%;left:50%;transform:translate(-50%,-50%)"
     : "bottom:90px;" + posCSS;
+  const panelClosedTransform = isPopup ? "" : w.position === "bottom-center" ? "translateX(-50%) translateY(20px)" : "translateY(20px)";
+  const panelOpenTransform = isPopup ? "" : w.position === "bottom-center" ? "translateX(-50%) translateY(0)" : "translateY(0)";
 
   return `(function(){
 'use strict';
@@ -60,8 +62,8 @@ sh.innerHTML='<style>'
 +'@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");'
 +'*{box-sizing:border-box;margin:0;padding:0}'
 +'body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#1f2937;line-height:1.5}'
-+'.wp-panel{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;position:absolute;'+panelPosCSS+';width:420px;max-width:calc(100vw - 32px);max-height:85vh;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;'+(isPopup ? 'opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;transform:translate(-50%,-48%);pointer-events:none;' : 'transform:translateY(20px);opacity:0;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);pointer-events:none;')+'display:flex;flex-direction:column}'
-+'.wp-panel.open{opacity:1;pointer-events:all'+(isPopup ? ';transform:translate(-50%,-50%)' : ';transform:translateY(0)')+'}'
++'.wp-panel{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;position:absolute;'+panelPosCSS+';width:420px;max-width:calc(100vw - 32px);max-height:85vh;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;'+(isPopup ? 'opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;transform:translate(-50%,-48%);pointer-events:none;' : 'transform:'+panelClosedTransform+';opacity:0;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);pointer-events:none;')+'display:flex;flex-direction:column}'
++'.wp-panel.open{opacity:1;pointer-events:all'+(isPopup ? ';transform:translate(-50%,-50%)' : ';transform:'+panelOpenTransform)+'}'
 +'.wp-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 24px 0}'
 +'.wp-hdr h3{font-size:20px;font-weight:700;color:#111827;letter-spacing:-0.02em;line-height:1.3}'
 +'.wp-subtitle{font-size:13px;color:#6b7280;margin-top:4px;line-height:1.4}'
@@ -84,7 +86,7 @@ sh.innerHTML='<style>'
 +'.wp-textarea{width:100%;padding:14px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:14px;font-family:inherit;color:#111827;outline:none;resize:vertical;min-height:110px;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);background:#fff;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.04)}'
 +'.wp-textarea::placeholder{color:#b0b7c3;font-weight:400}'
 +'.wp-textarea:focus{border-color:'+W+';box-shadow:0 0 0 4px '+W+'12,0 1px 2px rgba(0,0,0,0.04)}'
-+'.wp-textarea-group{display:flex;flex-direction:column;gap:6px}'
++'.wp-textarea-wrap{display:flex;flex-direction:column;gap:8px}'
 +'.wp-char{font-size:12px;color:#9ca3af;text-align:right;font-weight:500;padding-right:4px}'
 +'.wp-submit{width:100%;padding:14px;border:none;border-radius:12px;background:'+W+';color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;margin-top:4px}'
 +'.wp-submit:hover{opacity:0.92;transform:translateY(-1px);box-shadow:0 4px 12px '+W+'44}'
@@ -110,7 +112,7 @@ sh.innerHTML='<style>'
 +'<div class="wp-hdr"><div><h3>'+H+'</h3><p class="wp-subtitle">'+D+'</p></div><button class="wp-close" id="cb"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg></button></div>'
 +'<form class="wp-form" id="fm">'
 +(S?'<div class="wp-stars" id="st">'+Array(5).fill(0).map((_,i)=>'<span data-i="'+i+'"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>').join('')+'</div>':'')
-+'<div class="wp-field-group wp-textarea-group">'
++'<div class="wp-textarea-wrap">'
 +'<textarea class="wp-field wp-textarea" id="ct" placeholder="'+PL+'" rows="4" maxlength="'+MX+'"></textarea>'
 +'</div>'
 +'<div class="wp-char"><span id="cc">0</span> / '+MX+'</div>'
@@ -134,9 +136,10 @@ ${w.display_type === 'floating' ? `
 var tb=document.createElement('button');
 tb.id='tb';
 tb.textContent='💬';
-tb.style.cssText='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${w.primary_color};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto';
-tb.addEventListener('mouseenter',function(){this.style.transform='scale(1.1)'});
-tb.addEventListener('mouseleave',function(){this.style.transform='scale(1)'});
+var btnPos='position:fixed;bottom:24px;${posCSS};width:56px;height:56px;border-radius:50%;background:${w.primary_color};color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto';
+tb.style.cssText=btnPos;
+tb.addEventListener('mouseenter',function(){this.style.transform=(this.style.transform||'').includes('translateX')?'translateX(-50%) scale(1.1)':'scale(1.1)'});
+tb.addEventListener('mouseleave',function(){this.style.transform=(this.style.transform||'').includes('translateX')?'translateX(-50%)':'scale(1)'});
 var tbParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
 tbParent.appendChild(tb);
 ` : ''}
