@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Lock, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updatePassword } from "@/app/actions/auth";
 import { Suspense } from "react";
@@ -79,38 +79,32 @@ function UpdatePasswordForm() {
                 <label htmlFor="password" className="font-body-sm block text-ink">
                   New password
                 </label>
-                <div className="relative mt-1">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-                  <input
+                <input
                     id="password"
                     name="password"
                     type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
-                    className="input-field mt-0 pl-10"
+                    className="input-field mt-1"
                     placeholder="••••••••"
                   />
-                </div>
               </div>
 
               <div>
                 <label htmlFor="confirm" className="font-body-sm block text-ink">
                   Confirm password
                 </label>
-                <div className="relative mt-1">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-                  <input
+                <input
                     id="confirm"
                     name="confirm"
                     type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
-                    className="input-field mt-0 pl-10"
+                    className="input-field mt-1"
                     placeholder="••••••••"
                   />
-                </div>
               </div>
 
               {error && (
