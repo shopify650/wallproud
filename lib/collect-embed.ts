@@ -47,6 +47,8 @@ var POS='${escJS(w.position)}';
 var DT='${escJS(w.display_type)}';
 var WID='${w.id}';
 var API='${origin}';
+var panelPosCSS='${panelPosCSS}';
+var isPopup=${isPopup};
 
 var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
