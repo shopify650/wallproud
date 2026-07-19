@@ -9,7 +9,6 @@ import {
   Folder,
   Download,
   Settings,
-  LogOut,
   Menu,
   X,
   Sparkles,
@@ -124,30 +123,6 @@ export default function Sidebar({
                 Upgrade
               </Link>
             )}
-          </div>
-
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-medium text-ink">
-              {user.full_name
-                ? user.full_name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)
-                : "U"}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-body-sm text-ink">
-                {user.full_name || "User"}
-              </p>
-              <p className="truncate font-caption text-muted">{user.email}</p>
-            </div>
-            <form action="/auth/signout" method="post" className="shrink-0">
-              <button type="submit" className="rounded-full p-1.5 text-muted hover:bg-surface-1 hover:text-ink transition-colors">
-                <LogOut className="h-4 w-4" />
-              </button>
-            </form>
           </div>
         </div>
       </aside>
