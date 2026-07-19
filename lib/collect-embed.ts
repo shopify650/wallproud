@@ -145,7 +145,7 @@ sh.innerHTML='<style>'
 +'<div class="wp-ft"><span id="pw" style="display:'+(PB?'block':'none')+'"><a href="https://wallproud.com" target="_blank">Powered by WallProud</a></span></div>'
 +'</div>'
 
-var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
+var s = document.currentScript || (function(){var scripts=document.getElementsByTagName('script');for(var i=scripts.length-1;i>=0;i--){if(scripts[i].src && scripts[i].src.indexOf(WID)!==-1)return scripts[i]}return scripts[scripts.length-1]})();
 var cParent=isInline ? (s && s.parentNode && s.parentNode !== document.head ? s.parentNode : document.body) : ((document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body);
 if(s && s.parentNode && isInline){
   s.parentNode.insertBefore(c, s.nextSibling);
