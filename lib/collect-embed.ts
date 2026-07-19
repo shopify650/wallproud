@@ -25,8 +25,6 @@ export function generateCollectEmbedScript(
     ? "opacity:1;pointer-events:all;transform:translate(-50%,-50%)"
     : "opacity:1;pointer-events:all;transform:" + panelOpenTransform;
 
-  const panelStartClass = w.display_type === 'inline' ? 'wp-inline-host' : 'wp-panel';
-
   return `(function(){
 'use strict';
 var W='${escJS(w.primary_color)}';
@@ -126,7 +124,7 @@ sh.innerHTML='<style>'
 +'@keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}'
 +'@keyframes fieldFocus{0%{transform:scale(1)}50%{transform:scale(1.01)}100%{transform:scale(1)}}'
 +'</style>'
-+'<div class="'+panelStartClass+'" id="pn">'
++'<div class="wp-panel" id="pn">'
 +'<div class="wp-hdr"><div><h3>'+H+'</h3><p class="wp-subtitle">'+D+'</p></div><button class="wp-close" id="cb"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg></button></div>'
 +'<form class="wp-form" id="fm">'
 +(S?'<div class="wp-stars" id="st">'+Array(5).fill(0).map((_,i)=>'<span data-i="'+i+'"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>').join('')+'</div>':'')
