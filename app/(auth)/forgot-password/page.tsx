@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { resetPassword } from "@/app/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -24,15 +24,22 @@ export default function ForgotPasswordPage() {
     }
 
     setLoading(true);
-    const result = await resetPassword(email);
+
+    // Call Supabase directly from the client so the PKCE code verifier
+    // is stored in the browser (localStorage), not on the server.
+    const supabase = createClient();
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+
     setLoading(false);
 
-    if (result.success) {
+    if (resetError) {
+      setError(resetError.message);
+      toast.error(resetError.message);
+    } else {
       setSent(true);
       toast.success("Reset link sent to your email");
-    } else {
-      setError(result.error || "Something went wrong");
-      toast.error(result.error || "Something went wrong");
     }
   }
 
@@ -71,14 +78,14 @@ export default function ForgotPasswordPage() {
                   Email
                 </label>
                 <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="input-field mt-1"
-                    placeholder="you@example.com"
-                  />
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="input-field mt-1"
+                  placeholder="you@example.com"
+                />
               </div>
 
               {error && (
