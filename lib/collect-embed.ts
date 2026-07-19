@@ -61,15 +61,25 @@ var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
 var c=document.createElement('div');
 c.id=cid;
-c.style.cssText='position:fixed;inset:0;z-index:99999;pointer-events:none';
+var isInline=DT==='inline';
+if(isInline){
+  c.className='wp-inline-host';
+  c.style.cssText='width:100%;max-width:560px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;opacity:1;transform:none;pointer-events:auto';
+}else{
+  c.style.cssText='position:fixed;inset:0;z-index:99999;pointer-events:none';
+}
 var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
 +'@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");'
 +'*{box-sizing:border-box;margin:0;padding:0}'
 +'body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#1f2937;line-height:1.5}'
-+'.wp-panel{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;position:absolute;'+panelPosCSS+';width:420px;max-width:calc(100vw - 32px);max-height:85vh;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;${panelCSS}display:flex;flex-direction:column}'
-+'.wp-panel.open{${panelOpenCSS}}'
++'.wp-panel{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;'+(isInline ? 'position:static;' : 'position:absolute;'+panelPosCSS+';')+'width:100%;max-width:100%;max-height:none;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;'+(isInline ? 'opacity:1;transform:none;pointer-events:auto;' : isPopup ? 'opacity:0;transition:opacity 0.3s ease,transform 0.3s ease;transform:translate(-50%,-48%);pointer-events:none;' : 'transform:'+panelClosedTransform+';opacity:0;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);pointer-events:none;')+'display:flex;flex-direction:column}'
++'.wp-panel.open{opacity:1;pointer-events:all'+(isInline ? '' : isPopup ? ';transform:translate(-50%,-50%)' : ';transform:'+panelOpenTransform)+'}'
++'.wp-inline-host{position:relative;width:100%;max-width:560px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;opacity:1;transform:none;pointer-events:auto}'
++'.wp-inline-host .wp-form{padding:24px}'
++'.wp-inline-host .wp-hdr{padding:24px 24px 0}'
++'.wp-inline-host .wp-ft{padding:16px 24px}'
 +'.wp-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 24px 0}'
 +'.wp-hdr h3{font-size:20px;font-weight:700;color:#111827;letter-spacing:-0.02em;line-height:1.3}'
 +'.wp-subtitle{font-size:13px;color:#6b7280;margin-top:4px;line-height:1.4}'
@@ -114,7 +124,7 @@ sh.innerHTML='<style>'
 +'@keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}'
 +'@keyframes fieldFocus{0%{transform:scale(1)}50%{transform:scale(1.01)}100%{transform:scale(1)}}'
 +'</style>'
-+'<div class="wp-panel" id="pn">'
++${w.display_type === 'inline' ? '<div class="wp-inline-host" id="pn">' : '<div class="wp-panel" id="pn">'}
 +'<div class="wp-hdr"><div><h3>'+H+'</h3><p class="wp-subtitle">'+D+'</p></div><button class="wp-close" id="cb"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg></button></div>'
 +'<form class="wp-form" id="fm">'
 +(S?'<div class="wp-stars" id="st">'+Array(5).fill(0).map((_,i)=>'<span data-i="'+i+'"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>').join('')+'</div>':'')
@@ -135,7 +145,7 @@ sh.innerHTML='<style>'
 +'</div>'
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
-var cParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
+var cParent=isInline ? (s && s.parentNode && s.parentNode !== document.head ? s.parentNode : document.body) : ((document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body);
 cParent.appendChild(c);
 
 ${w.display_type === 'floating' ? `
@@ -158,9 +168,9 @@ ${isPopup ? `var bd=document.createElement('div');bd.className='wp-backdrop';doc
 
 ${w.display_type === 'floating' ? `
 if(tb)tb.addEventListener('click',function(){pn.classList.toggle('open')});
-` : `pn.classList.add('open');`+(isPopup ? 'bd.classList.add("open");' : '')}
+` : isInline ? '' : `pn.classList.add('open');`+(isPopup ? 'bd.classList.add("open");' : '')}
 
-sh.getElementById('cb').addEventListener('click',function(){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}});
+sh.getElementById('cb').addEventListener('click',function(){if(!isInline){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}});
 
 ${w.show_star_rating ? `
 var st=sh.getElementById('st');
@@ -211,7 +221,7 @@ for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl
 var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
 cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
 ` : ''}
-setTimeout(function(){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}},AC*1000);
+setTimeout(function(){if(!isInline){pn.classList.remove('open')${isPopup ? ';bd.classList.remove("open")' : ''}}},AC*1000);
 }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
 }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
 });
