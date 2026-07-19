@@ -25,7 +25,7 @@ export function generateCollectEmbedScript(
     ? "opacity:1;pointer-events:all;transform:translate(-50%,-50%)"
     : "opacity:1;pointer-events:all;transform:" + panelOpenTransform;
 
-  const panelStartClass = isInline ? 'wp-inline-host' : 'wp-panel';
+  const panelStartClass = w.display_type === 'inline' ? 'wp-inline-host' : 'wp-panel';
 
   return `(function(){
 'use strict';
