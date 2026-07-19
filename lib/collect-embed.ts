@@ -47,7 +47,7 @@ var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
 var c=document.createElement('div');
 c.id=cid;
-c.style.cssText='position:fixed;inset:0;z-index:99999;pointer-events:none';
+c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none';
 var sh=c.attachShadow({mode:'open'});
 var posCSS='${posCSS}';
 sh.innerHTML='<style>'
@@ -104,8 +104,7 @@ sh.innerHTML='<style>'
 +(DT==='floating'?'<button class="wp-btn" id="tb" style="position:absolute;bottom:24px;'+posCSS+';width:56px;height:56px;border-radius:50%;background:'+W+';color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:24px;z-index:99999;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:auto">💬</button>':'');
 
 var s = document.currentScript || (document.scripts ? document.scripts[document.scripts.length - 1] : null);
-var p = s && s.parentNode && s.parentNode !== document.head ? s.parentNode : document.body;
-p.appendChild(c);
+document.body.appendChild(c);
 
 var pn=sh.getElementById('pn');
 var fm=sh.getElementById('fm');
