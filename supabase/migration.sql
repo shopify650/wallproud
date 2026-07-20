@@ -439,7 +439,7 @@ grant execute on function public.complete_collection_request(text) to anon, auth
 -- ============================================================================
 
 -- Allow anonymous visitors to read only APPROVED testimonials.
-create policy if not exists "Public can read approved testimonials"
+create policy "Public can read approved testimonials"
   on public.testimonials for select
   to anon, authenticated
   using (status = 'approved');
