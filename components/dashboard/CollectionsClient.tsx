@@ -5,8 +5,9 @@ import Link from "next/link";
 import { toast } from "react-hot-toast";
 import {
   Link2, Copy, Check, Plus, Trash2, Send, Clock, CheckCircle2, XCircle,
+  Pencil, X,
 } from "lucide-react";
-import { createCollection, deleteCollection } from "@/app/actions/collect";
+import { createCollection, deleteCollection, updateCollection } from "@/app/actions/collect";
 
 type CollectionRequest = {
   id: string;
@@ -17,6 +18,13 @@ type CollectionRequest = {
   token: string | null;
   expires_at: string | null;
   created_at: string;
+  title: string;
+  description: string;
+  button_text: string;
+  thank_you_message: string;
+  brand_color: string;
+  field_config: Record<string, any>;
+  redirect_url: string | null;
 };
 
 const statusMeta: Record<CollectionRequest["status"], { label: string; icon: typeof Clock; className: string }> = {
@@ -25,6 +33,183 @@ const statusMeta: Record<CollectionRequest["status"], { label: string; icon: typ
   completed: { label: "Completed",icon: CheckCircle2,  className: "bg-surface-1 text-success" },
   expired:   { label: "Expired",  icon: XCircle,       className: "bg-surface-1 text-muted" },
 };
+
+const defaultFieldConfig = {
+  show_rating: true,
+  show_name: true,
+  name_required: false,
+  show_email: false,
+  email_required: false,
+  show_company: false,
+  company_required: false,
+  show_role: false,
+  role_required: false,
+  show_video: false,
+  min_characters: 10,
+  max_characters: 5000,
+};
+
+function EditModal({ collection, onClose, onSave }: {
+  collection: CollectionRequest;
+  onClose: () => void;
+  onSave: (id: string, data: any) => Promise<void>;
+}) {
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    title: collection.title || "Share your feedback",
+    description: collection.description || "We'd love to hear about your experience.",
+    buttonText: collection.button_text || "Submit Testimonial",
+    thankYouMessage: collection.thank_you_message || "Thanks for your feedback!",
+    brandColor: collection.brand_color || "#6366f1",
+    redirectUrl: collection.redirect_url || "",
+    fieldConfig: collection.field_config || defaultFieldConfig,
+  });
+
+  const updateField = (key: string, value: any) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const updateFieldConfig = (key: string, value: any) => {
+    setForm(prev => ({
+      ...prev,
+      fieldConfig: { ...prev.fieldConfig, [key]: value },
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    await onSave(collection.id, form);
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-surface-1 p-6 shadow-xl">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display-md text-ink">Customize Collection Link</h3>
+          <button onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface-2 hover:text-ink">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="font-caption text-muted">Form Title</label>
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => updateField("title", e.target.value)}
+                className="input-field mt-1"
+                maxLength={255}
+              />
+            </div>
+            <div>
+              <label className="font-caption text-muted">Button Text</label>
+              <input
+                type="text"
+                value={form.buttonText}
+                onChange={(e) => updateField("buttonText", e.target.value)}
+                className="input-field mt-1"
+                maxLength={100}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-caption text-muted">Description</label>
+            <textarea
+              value={form.description}
+              onChange={(e) => updateField("description", e.target.value)}
+              className="input-field mt-1"
+              rows={2}
+              maxLength={500}
+            />
+          </div>
+
+          <div>
+            <label className="font-caption text-muted">Thank You Message</label>
+            <input
+              type="text"
+              value={form.thankYouMessage}
+              onChange={(e) => updateField("thankYouMessage", e.target.value)}
+              className="input-field mt-1"
+              maxLength={255}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="font-caption text-muted">Brand Color</label>
+              <div className="mt-1 flex items-center gap-3">
+                <input
+                  type="color"
+                  value={form.brandColor}
+                  onChange={(e) => updateField("brandColor", e.target.value)}
+                  className="h-10 w-14 rounded-lg border border-hairline bg-transparent p-1"
+                />
+                <input
+                  type="text"
+                  value={form.brandColor}
+                  onChange={(e) => updateField("brandColor", e.target.value)}
+                  className="input-field flex-1"
+                  maxLength={20}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="font-caption text-muted">Redirect URL after submit (optional)</label>
+              <input
+                type="url"
+                value={form.redirectUrl}
+                onChange={(e) => updateField("redirectUrl", e.target.value)}
+                placeholder="https://your-site.com/thank-you"
+                className="input-field mt-1"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="font-caption text-ink">Form Fields</p>
+            <p className="font-caption mt-1 text-muted">Choose which fields to show in the collection form.</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {[
+                { key: "show_rating", label: "Star Rating", type: "toggle" },
+                { key: "show_name", label: "Name Field", type: "toggle" },
+                { key: "show_email", label: "Email Field", type: "toggle" },
+                { key: "show_company", label: "Company Field", type: "toggle" },
+                { key: "show_role", label: "Role Field", type: "toggle" },
+                { key: "show_video", label: "Video Upload", type: "toggle" },
+              ].map((field) => (
+                <div key={field.key} className="flex items-center justify-between rounded-lg bg-surface-2 p-3">
+                  <span className="font-body-sm text-ink">{field.label}</span>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={!!form.fieldConfig[field.key]}
+                      onChange={(e) => updateFieldConfig(field.key, e.target.checked)}
+                      className="h-4 w-4 rounded border-hairline bg-surface-1 text-accent focus:ring-accent"
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4">
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="btn-primary">
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 export default function CollectionsClient({
   collections, workspaceId,
@@ -39,6 +224,7 @@ export default function CollectionsClient({
   const [justCreated, setJustCreated] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const shareLink = useCallback((token: string) => {
     if (typeof window === "undefined") return "";
@@ -49,7 +235,12 @@ export default function CollectionsClient({
     e.preventDefault();
     if (!email.trim()) return toast.error("Enter the recipient's email");
     setCreating(true);
-    const res = await createCollection({ workspaceId, recipientEmail: email.trim(), recipientName: name.trim(), expiresInDays: expiresInDays ? parseInt(expiresInDays) : null });
+    const res = await createCollection({
+      workspaceId,
+      recipientEmail: email.trim(),
+      recipientName: name.trim(),
+      expiresInDays: expiresInDays ? parseInt(expiresInDays) : null,
+    });
     setCreating(false);
     if (res.error) return toast.error(res.error);
     if (!res.token) return toast.error("Something went wrong");
@@ -76,6 +267,18 @@ export default function CollectionsClient({
     if (res.error) return toast.error(res.error);
     toast.success("Collection deleted");
   }, []);
+
+  const handleSaveEdit = useCallback(async (id: string, data: any) => {
+    const res = await updateCollection(id, data);
+    if (res.error) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("Collection updated");
+    setEditingId(null);
+  }, []);
+
+  const editingCollection = collections.find(c => c.id === editingId);
 
   return (
     <div className="space-y-6">
@@ -188,15 +391,28 @@ export default function CollectionsClient({
                       </a>
                     </div>
                   )}
-                  <button onClick={() => handleDelete(c.id)} disabled={deletingId === c.id} className="rounded-lg p-1.5 text-muted hover:bg-surface-1 hover:text-ink disabled:opacity-50" title="Delete">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => setEditingId(c.id)} className="rounded-lg p-1.5 text-muted hover:bg-surface-1 hover:text-ink" title="Customize">
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => handleDelete(c.id)} disabled={deletingId === c.id} className="rounded-lg p-1.5 text-muted hover:bg-surface-1 hover:text-ink disabled:opacity-50" title="Delete">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {editingCollection && (
+        <EditModal
+          collection={editingCollection}
+          onClose={() => setEditingId(null)}
+          onSave={handleSaveEdit}
+        />
+      )}
     </div>
   );
 }

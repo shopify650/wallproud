@@ -65,6 +65,9 @@ export default async function CollectPage({
 
   const workspace = request.workspace;
 
+  const title = request.title || workspace?.name || "Share your feedback";
+  const description = request.description || (request.recipient_name ? `${workspace?.name || "We"} would love your feedback!` : "We'd love your feedback!");
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-indigo-50 p-4">
       <div className="w-full max-w-lg">
@@ -77,19 +80,26 @@ export default async function CollectPage({
                 className="mx-auto mb-3 h-12 w-12 rounded-xl object-cover"
               />
             )}
-            <h1 className="text-xl font-bold text-gray-900">
-              {workspace?.name || "Share your feedback"}
+            <h1 className="text-xl font-bold text-gray-900" style={{ color: request.brand_color || undefined }}>
+              {title}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              {request.recipient_name
-                ? `${workspace?.name || "We"} would love your feedback!`
-                : "We'd love your feedback!"}
+              {description}
             </p>
           </div>
 
           <CollectForm
             token={slug}
             workspaceColor={workspace?.primary_color || "#4f46e5"}
+            config={{
+              title: request.title,
+              description: request.description,
+              buttonText: request.button_text,
+              thankYouMessage: request.thank_you_message,
+              brandColor: request.brand_color,
+              fieldConfig: request.field_config as any,
+              redirectUrl: request.redirect_url ?? undefined,
+            }}
           />
         </div>
       </div>

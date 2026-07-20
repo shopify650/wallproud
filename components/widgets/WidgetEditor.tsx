@@ -218,24 +218,33 @@ export default function WidgetEditor({
 
   const embedOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.com";
   
-  const framerCode = `import * as React from "react"
+  const framerCode = `// Get Started: https://www.framer.com/developers
+
+import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
+/**
+ * @framerSupportedLayoutWidth any
+ * @framerSupportedLayoutHeight any
+ */
 export default function Wallproud(props) {
+    const { widgetId } = props
     const containerRef = React.useRef(null)
 
     React.useEffect(() => {
-        if (!containerRef.current || !props.widgetId) return
+        const container = containerRef.current
+        if (!container || !widgetId) return
 
-        containerRef.current.innerHTML = ""
+        const src = "${embedOrigin}/embed/" + widgetId + ".js"
+        container.innerHTML = '<script src="' + src + '" async></script>'
+    }, [widgetId])
 
-        const script = document.createElement("script")
-        script.src = \`${embedOrigin}/embed/\${props.widgetId}.js\`
-        script.async = true
-        containerRef.current.appendChild(script)
-    }, [props.widgetId])
-
-    return <div ref={containerRef} style={{ ...props.style, width: "100%", display: "block" }} />
+    return (
+        <div
+            ref={containerRef}
+            style={{ width: "100%", display: "block", ...props.style }}
+        />
+    )
 }
 
 addPropertyControls(Wallproud, {
@@ -243,7 +252,7 @@ addPropertyControls(Wallproud, {
         title: "Widget ID",
         type: ControlType.String,
         defaultValue: "${widget.id}",
-    }
+    },
 })`;
 
   const embedCode =

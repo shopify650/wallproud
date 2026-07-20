@@ -17,7 +17,30 @@ const submitSchema = z.object({
 
 export type CollectFormData = z.infer<typeof submitSchema>;
 
-export async function getCollectionRequest(slug: string) {
+export async function getCollectionRequest(slug: string): Promise<{
+  id: string;
+  workspace_id: string;
+  recipient_email: string;
+  recipient_name: string | null;
+  status: "pending" | "sent" | "completed" | "expired";
+  token: string | null;
+  expires_at: string | null;
+  created_at: string;
+  title: string;
+  description: string;
+  button_text: string;
+  thank_you_message: string;
+  brand_color: string;
+  field_config: Record<string, any>;
+  redirect_url: string | null;
+  workspace: {
+    id: string;
+    name: string;
+    slug: string;
+    logo_url: string | null;
+    primary_color: string;
+  } | null;
+} | null> {
   const supabase = await createClient();
 
   const { data: request, error } = await supabase
@@ -38,7 +61,7 @@ export async function getCollectionRequest(slug: string) {
     workspace = ws;
   }
 
-  return { ...request, workspace };
+  return { ...(request as any), workspace };
 }
 
 export async function submitTestimonial(
@@ -157,6 +180,13 @@ const createCollectionSchema = z.object({
   recipientEmail: z.string().email().max(255),
   recipientName: z.string().max(100).optional().or(z.literal("")),
   expiresInDays: z.number().int().min(1).max(365).optional().nullable(),
+  title: z.string().max(255).optional().or(z.literal("")),
+  description: z.string().max(500).optional().or(z.literal("")),
+  buttonText: z.string().max(100).optional().or(z.literal("")),
+  thankYouMessage: z.string().max(255).optional().or(z.literal("")),
+  brandColor: z.string().max(20).optional().or(z.literal("")),
+  fieldConfig: z.record(z.string(), z.any()).optional(),
+  redirectUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function createCollection(
@@ -182,12 +212,55 @@ export async function createCollection(
     token,
     status: "pending",
     expires_at: expiresAt,
+    title: parsed.data.title || "Share your feedback",
+    description: parsed.data.description || "We'd love to hear about your experience.",
+    button_text: parsed.data.buttonText || "Submit Testimonial",
+    thank_you_message: parsed.data.thankYouMessage || "Thanks for your feedback!",
+    brand_color: parsed.data.brandColor || "#6366f1",
+    field_config: parsed.data.fieldConfig || {},
+    redirect_url: parsed.data.redirectUrl || null,
   });
 
   if (error) return { success: false, error: error.message };
 
   revalidatePath("/dashboard/collections");
   return { success: true, token };
+}
+
+export async function updateCollection(
+  id: string,
+  input: {
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    thankYouMessage?: string;
+    brandColor?: string;
+    fieldConfig?: Record<string, any>;
+    redirectUrl?: string;
+  },
+): Promise<{ success: boolean; error?: string }> {
+  if (!id) return { success: false, error: "Missing collection id" };
+
+  const supabase = await createClient();
+
+  const updateData: Record<string, any> = {};
+  if (input.title !== undefined) updateData.title = input.title;
+  if (input.description !== undefined) updateData.description = input.description;
+  if (input.buttonText !== undefined) updateData.button_text = input.buttonText;
+  if (input.thankYouMessage !== undefined) updateData.thank_you_message = input.thankYouMessage;
+  if (input.brandColor !== undefined) updateData.brand_color = input.brandColor;
+  if (input.fieldConfig !== undefined) updateData.field_config = input.fieldConfig;
+  if (input.redirectUrl !== undefined) updateData.redirect_url = input.redirectUrl || null;
+
+  const { error } = await supabase
+    .from("collection_requests")
+    .update(updateData)
+    .eq("id", id);
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/dashboard/collections");
+  return { success: true };
 }
 
 export async function deleteCollection(

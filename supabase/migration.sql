@@ -108,7 +108,27 @@ create table if not exists public.collection_requests (
   status           text        not null default 'pending' check (status in ('pending', 'sent', 'completed', 'expired')),
   token            text        unique,
   expires_at       timestamptz,
-  created_at       timestamptz not null default now()
+  created_at       timestamptz not null default now(),
+  title            text        not null default 'Share your feedback',
+  description      text        not null default 'We''d love to hear about your experience.',
+  button_text      text        not null default 'Submit Testimonial',
+  thank_you_message text      not null default 'Thanks for your feedback!',
+  brand_color      text        not null default '#6366f1',
+  field_config     jsonb       not null default '{
+    "show_rating": true,
+    "show_name": true,
+    "name_required": false,
+    "show_email": false,
+    "email_required": false,
+    "show_company": false,
+    "company_required": false,
+    "show_role": false,
+    "role_required": false,
+    "show_video": false,
+    "min_characters": 10,
+    "max_characters": 5000
+  }'::jsonb,
+  redirect_url     text
 );
 
 -- ----------------------------------------------------------------------------

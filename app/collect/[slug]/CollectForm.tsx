@@ -1,9 +1,34 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Star, ArrowRight, ArrowLeft, Camera, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import { submitTestimonial, uploadVideo } from "@/app/actions/collect";
+
+type FieldConfig = {
+  show_rating: boolean;
+  show_name: boolean;
+  name_required: boolean;
+  show_email: boolean;
+  email_required: boolean;
+  show_company: boolean;
+  company_required: boolean;
+  show_role: boolean;
+  role_required: boolean;
+  show_video: boolean;
+  min_characters: number;
+  max_characters: number;
+};
+
+type CollectionConfig = {
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  thankYouMessage?: string;
+  brandColor?: string;
+  fieldConfig?: FieldConfig;
+  redirectUrl?: string;
+};
 
 function fireConfetti(color: string) {
   const colors = [color, "#818cf8", "#a5b4fc"];
@@ -109,10 +134,30 @@ function StepIndicator({
 export default function CollectForm({
   token,
   workspaceColor,
+  config,
 }: {
   token: string;
   workspaceColor: string;
+  config?: CollectionConfig;
 }) {
+  const brandColor = config?.brandColor || workspaceColor;
+  const fieldConfig: FieldConfig = config?.fieldConfig || {
+    show_rating: true,
+    show_name: true,
+    name_required: false,
+    show_email: false,
+    email_required: false,
+    show_company: false,
+    company_required: false,
+    show_role: false,
+    role_required: false,
+    show_video: false,
+    min_characters: 10,
+    max_characters: 5000,
+  };
+
+  const totalSteps = [fieldConfig.show_rating, true, fieldConfig.show_video].filter(Boolean).length + 1;
+
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -137,6 +182,14 @@ export default function CollectForm({
       setForm((prev) => ({ ...prev, [field]: value })),
     [],
   );
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && config?.redirectUrl && done) {
+      setTimeout(() => {
+        window.location.href = config.redirectUrl!;
+      }, 2000);
+    }
+  }, [done, config]);
 
   const startRecording = async () => {
     try {
@@ -168,8 +221,16 @@ export default function CollectForm({
   };
 
   const canNext = () => {
-    if (step === 0) return form.rating != null;
-    if (step === 1) return form.content.trim().length > 0 && form.author_name.trim().length > 0;
+    if (step === 0 && fieldConfig.show_rating) return form.rating != null;
+    if (step === 1) {
+      const minLen = fieldConfig.min_characters || 10;
+      if (form.content.trim().length < minLen) return false;
+      if (fieldConfig.show_name && fieldConfig.name_required && !form.author_name.trim()) return false;
+      if (fieldConfig.show_email && fieldConfig.email_required && !form.author_email.trim()) return false;
+      if (fieldConfig.show_company && fieldConfig.company_required && !form.author_company.trim()) return false;
+      if (fieldConfig.show_role && fieldConfig.role_required && !form.author_role.trim()) return false;
+      return true;
+    }
     return true;
   };
 
@@ -202,7 +263,7 @@ export default function CollectForm({
       if (res.error === "already_submitted") {
         toast("You already submitted feedback!", { icon: "👋" });
         setDone(true);
-        fireConfetti(workspaceColor);
+        fireConfetti(brandColor);
         return;
       }
 
@@ -213,7 +274,7 @@ export default function CollectForm({
       }
 
       setDone(true);
-      fireConfetti(workspaceColor);
+      fireConfetti(brandColor);
     } catch {
       toast.error("Something went wrong");
     }
@@ -227,7 +288,7 @@ export default function CollectForm({
           <Check className="h-8 w-8 text-green-500" />
         </div>
         <h2 className="mt-4 text-xl font-bold text-gray-900">
-          Thank you for your feedback!
+          {config?.thankYouMessage || "Thank you for your feedback!"}
         </h2>
         <p className="mt-2 text-sm text-gray-500">
           Your testimonial has been submitted and is awaiting review.
@@ -236,14 +297,22 @@ export default function CollectForm({
     );
   }
 
+  const steps = [];
+  if (fieldConfig.show_rating) steps.push("rating");
+  steps.push("details");
+  if (fieldConfig.show_video) steps.push("video");
+  steps.push("submit");
+
+  const currentStepIndex = step;
+
   return (
     <div className="px-6 py-8">
-      <StepIndicator current={step} total={4} />
+      <StepIndicator current={currentStepIndex} total={steps.length} />
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (step < 3) {
+          if (step < steps.length - 1) {
             setStep((s) => s + 1);
           } else {
             handleSubmit();
@@ -252,7 +321,7 @@ export default function CollectForm({
         className="mt-8"
       >
         {/* Step 0: Rating */}
-        {step === 0 && (
+        {step === 0 && fieldConfig.show_rating && (
           <div className="space-y-6 text-center">
             <p className="text-lg font-medium text-gray-700">
               How would you rate your experience?
@@ -260,7 +329,7 @@ export default function CollectForm({
             <StarSelector
               value={form.rating}
               onChange={(v) => update("rating", v)}
-              color={workspaceColor}
+              color={brandColor}
             />
           </div>
         )}
@@ -274,68 +343,81 @@ export default function CollectForm({
             <textarea
               required
               rows={4}
+              minLength={fieldConfig.min_characters}
+              maxLength={fieldConfig.max_characters}
               value={form.content}
               onChange={(e) => update("content", e.target.value)}
               placeholder="Tell us what you loved most..."
               className="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
-              style={{ outlineColor: workspaceColor }}
+              style={{ outlineColor: brandColor }}
             />
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Your name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.author_name}
-                onChange={(e) => update("author_name", e.target.value)}
-                placeholder="Jane Doe"
-                className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
-              />
-            </div>
+            {fieldConfig.show_name && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Your name {fieldConfig.name_required && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type="text"
+                  required={fieldConfig.name_required}
+                  value={form.author_name}
+                  onChange={(e) => update("author_name", e.target.value)}
+                  placeholder="Jane Doe"
+                  className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
+                />
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
+              {fieldConfig.show_company && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Company {fieldConfig.company_required && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    required={fieldConfig.company_required}
+                    value={form.author_company}
+                    onChange={(e) => update("author_company", e.target.value)}
+                    placeholder="Acme Inc"
+                    className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
+                  />
+                </div>
+              )}
+              {fieldConfig.show_role && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Role {fieldConfig.role_required && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    required={fieldConfig.role_required}
+                    value={form.author_role}
+                    onChange={(e) => update("author_role", e.target.value)}
+                    placeholder="CEO"
+                    className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
+                  />
+                </div>
+              )}
+            </div>
+            {fieldConfig.show_email && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Company
+                  Email {fieldConfig.email_required && <span className="text-red-500">*</span>}
                 </label>
                 <input
-                  type="text"
-                  value={form.author_company}
-                  onChange={(e) => update("author_company", e.target.value)}
-                  placeholder="Acme Inc"
+                  type="email"
+                  required={fieldConfig.email_required}
+                  value={form.author_email}
+                  onChange={(e) => update("author_email", e.target.value)}
+                  placeholder="jane@example.com"
                   className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <input
-                  type="text"
-                  value={form.author_role}
-                  onChange={(e) => update("author_role", e.target.value)}
-                  placeholder="CEO"
-                  className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email (for verification)
-              </label>
-              <input
-                type="email"
-                value={form.author_email}
-                onChange={(e) => update("author_email", e.target.value)}
-                placeholder="jane@example.com"
-                className="mt-1 block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
-              />
-            </div>
+            )}
           </div>
         )}
 
         {/* Step 2: Video */}
-        {step === 2 && (
+        {step === 2 && fieldConfig.show_video && (
           <div className="space-y-6 text-center">
             <p className="text-lg font-medium text-gray-700">
               Want to add a video testimonial?
@@ -434,7 +516,7 @@ export default function CollectForm({
             type="submit"
             disabled={!canNext() || submitting}
             className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ backgroundColor: workspaceColor }}
+            style={{ backgroundColor: brandColor }}
             onMouseEnter={(e) => {
               if (!submitting && canNext()) {
                 e.currentTarget.style.filter = "brightness(1.1)";
@@ -446,10 +528,10 @@ export default function CollectForm({
           >
             {submitting
               ? "Submitting..."
-              : step < 3
+              : step < steps.length - 1
                 ? "Continue"
-                : "Submit feedback"}
-            {step < 3 && <ArrowRight className="h-4 w-4" />}
+                : config?.buttonText || "Submit feedback"}
+            {step < steps.length - 1 && <ArrowRight className="h-4 w-4" />}
           </button>
         </div>
       </form>
