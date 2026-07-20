@@ -44,7 +44,7 @@ create table if not exists public.workspaces (
   name          text        not null,
   slug          text        not null unique,
   logo_url      text,
-  primary_color text        not null default '#6366f1',
+  primary_color text        not null default '#000000',
   settings      jsonb       not null default '{}'::jsonb,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
@@ -115,7 +115,7 @@ alter table public.collection_requests add column if not exists title text not n
 alter table public.collection_requests add column if not exists description text not null default 'We''d love to hear about your experience.';
 alter table public.collection_requests add column if not exists button_text text not null default 'Submit Testimonial';
 alter table public.collection_requests add column if not exists thank_you_message text not null default 'Thanks for your feedback!';
-alter table public.collection_requests add column if not exists brand_color text not null default '#6366f1';
+alter table public.collection_requests add column if not exists brand_color text not null default '#000000';
 alter table public.collection_requests add column if not exists field_config jsonb not null default '{
   "show_rating": true,
   "show_name": true,

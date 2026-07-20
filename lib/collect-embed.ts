@@ -221,7 +221,7 @@ if(d.success){
 fm.style.display='none';$('sc').style.display='block';
 ${w.show_confetti ? `
 var cf=document.createElement('div');cf.className='cfetti';
-var cl=['#6366f1','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
+var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
 for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}
 var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
 cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);

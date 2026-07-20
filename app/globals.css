@@ -9,9 +9,9 @@
   --ink-muted: #999999;
   --hairline: #262626;
   --hairline-soft: #1a1a1a;
-  --accent-blue: #0099ff;
-  --primary: #ffffff;
-  --on-primary: #000000;
+  --accent-blue: #000000;
+  --primary: #000000;
+  --on-primary: #ffffff;
   --inverse-canvas: #ffffff;
   --inverse-ink: #000000;
 
@@ -267,7 +267,7 @@ body {
   --color-ink: #ffffff;
   --color-muted: #999999;
   --color-hairline: #262626;
-  --color-accent: #0099ff;
+  --color-accent: #000000;
   --color-success: #22c55e;
   --color-primary: #ffffff;
   --color-gradient-magenta: #d44df0;

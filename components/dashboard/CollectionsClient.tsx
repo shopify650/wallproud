@@ -60,7 +60,7 @@ function EditModal({ collection, onClose, onSave }: {
     description: collection.description || "We'd love to hear about your experience.",
     buttonText: collection.button_text || "Submit Testimonial",
     thankYouMessage: collection.thank_you_message || "Thanks for your feedback!",
-    brandColor: collection.brand_color || "#6366f1",
+    brandColor: collection.brand_color || "#000000",
     redirectUrl: collection.redirect_url || "",
     fieldConfig: collection.field_config || defaultFieldConfig,
   });
@@ -141,7 +141,8 @@ function EditModal({ collection, onClose, onSave }: {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="font-caption text-muted">Brand Color</label>
+              <label className="font-caption text-muted">Theme Color</label>
+              <p className="font-caption mt-0.5 text-muted">Controls the form button, stars, and accents. Milestone toggle stays blue.</p>
               <div className="mt-1 flex items-center gap-3">
                 <input
                   type="color"

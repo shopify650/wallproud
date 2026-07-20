@@ -10,7 +10,7 @@ create table if not exists public.collect_widgets (
   trigger text not null default 'click' check (trigger in ('click', 'scroll', 'exit-intent', 'timed')),
   scroll_percent integer not null default 70,
   delay_seconds integer not null default 5,
-  primary_color text not null default '#6366f1',
+  primary_color text not null default '#000000',
   heading text not null default 'We''d love your feedback!',
   description text not null default 'Share your experience with us',
   placeholder text not null default 'Tell us about your experience...',

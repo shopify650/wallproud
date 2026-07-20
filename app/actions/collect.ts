@@ -216,7 +216,7 @@ export async function createCollection(
     description: parsed.data.description || "We'd love to hear about your experience.",
     button_text: parsed.data.buttonText || "Submit Testimonial",
     thank_you_message: parsed.data.thankYouMessage || "Thanks for your feedback!",
-    brand_color: parsed.data.brandColor || "#6366f1",
+    brand_color: parsed.data.brandColor || "#000000",
     field_config: parsed.data.fieldConfig || {},
     redirect_url: parsed.data.redirectUrl || null,
   });

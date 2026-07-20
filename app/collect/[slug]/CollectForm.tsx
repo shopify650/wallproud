@@ -122,7 +122,7 @@ function StepIndicator({
           key={i}
           className={`h-2 rounded-full transition-all duration-300 ${
             i <= current
-              ? "w-8 bg-indigo-600"
+              ? "w-8 bg-blue-600"
               : "w-2 bg-gray-200"
           }`}
         />
@@ -140,7 +140,7 @@ export default function CollectForm({
   workspaceColor: string;
   config?: CollectionConfig;
 }) {
-  const brandColor = config?.brandColor || workspaceColor;
+  const brandColor = config?.brandColor || workspaceColor || "#000000";
   const fieldConfig: FieldConfig = config?.fieldConfig || {
     show_rating: true,
     show_name: true,
@@ -427,7 +427,7 @@ export default function CollectForm({
               <button
                 type="button"
                 onClick={recording ? stopRecording : startRecording}
-                className="mx-auto flex items-center gap-3 rounded-2xl border-2 border-dashed border-indigo-200 px-8 py-6 text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50"
+                 className="mx-auto flex items-center gap-3 rounded-2xl border-2 border-dashed border-gray-200 px-8 py-6 transition hover:border-gray-400 hover:bg-gray-50"
               >
                 <Camera className="h-8 w-8" />
                 <div className="text-left">
@@ -480,8 +480,8 @@ export default function CollectForm({
         {/* Step 3: Submit */}
         {step === 3 && (
           <div className="space-y-6 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-50">
-              <Check className="h-8 w-8 text-indigo-600" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gray-50">
+              <Check className="h-8 w-8" style={{ color: brandColor }} />
             </div>
             <div>
               <p className="text-lg font-medium text-gray-700">

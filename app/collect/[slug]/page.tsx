@@ -90,7 +90,7 @@ export default async function CollectPage({
 
           <CollectForm
             token={slug}
-            workspaceColor={workspace?.primary_color || "#4f46e5"}
+            workspaceColor={workspace?.primary_color || "#000000"}
             config={{
               title: request.title,
               description: request.description,

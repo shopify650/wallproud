@@ -29,7 +29,7 @@ const upsertSchema = z.object({
   trigger: z.enum(["click", "scroll", "exit-intent", "timed"]).default("click"),
   scroll_percent: z.number().int().min(10).max(100).default(70),
   delay_seconds: z.number().int().min(1).max(120).default(5),
-  primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#6366f1"),
+  primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#000000"),
   heading: z.string().min(1).max(200).default("We'd love your feedback!"),
   description: z.string().max(500).default("Share your experience with us"),
   placeholder: z.string().max(200).default("Tell us about your experience..."),

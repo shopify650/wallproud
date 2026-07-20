@@ -53,7 +53,7 @@ const defaultForm: FormState = {
   trigger: "click",
   scroll_percent: 70,
   delay_seconds: 5,
-  primary_color: "#6366f1",
+  primary_color: "#000000",
   heading: "We'd love your feedback!",
   description: "Share your experience with us",
   placeholder: "Tell us about your experience...",

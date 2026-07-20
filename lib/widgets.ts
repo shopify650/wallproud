@@ -66,7 +66,7 @@ export function getDefaultConfig(type: WidgetType): WidgetConfig {
     styling: {
       backgroundColor: "#ffffff",
       textColor: "#1f2937",
-      accentColor: "#4f46e5",
+      accentColor: "#000000",
       cardBackground: "#ffffff",
       cardBorderRadius: 16,
       cardPadding: 20,
