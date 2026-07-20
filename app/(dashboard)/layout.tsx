@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { getPlanLimits } from "@/lib/auth-utils";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
@@ -57,9 +58,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const planLimits = getPlanLimits((profile.plan as any) || "free");
+  const maxWorkspaces = planLimits.maxWorkspaces;
+
   return (
     <div className="flex min-h-screen bg-canvas">
-      <Sidebar user={profile} workspace={activeWorkspace} workspaces={workspaces} />
+      <Sidebar user={profile} workspace={activeWorkspace} workspaces={workspaces} maxWorkspaces={maxWorkspaces} />
       <div className="flex flex-1 flex-col lg:pl-64">
         <DashboardHeader workspace={activeWorkspace} />
         <main className="flex-1 px-6 py-8">

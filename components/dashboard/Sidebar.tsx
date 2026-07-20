@@ -40,10 +40,12 @@ export default function Sidebar({
   user,
   workspace,
   workspaces,
+  maxWorkspaces,
 }: {
   user: User;
   workspace: Workspace | null;
   workspaces: Workspace[];
+  maxWorkspaces: number;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -51,6 +53,8 @@ export default function Sidebar({
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [switchingId, setSwitchingId] = useState<string | null>(null);
+
+  const atLimit = workspaces.length >= maxWorkspaces;
 
   const handleSwitch = useCallback(async (id: string) => {
     if (id === workspace?.id) {
@@ -198,13 +202,14 @@ export default function Sidebar({
                         type="text"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
-                        placeholder="New workspace..."
+                        placeholder={atLimit ? `Limit reached (${maxWorkspaces})` : "New workspace..."}
                         className="input-field flex-1 py-1.5 text-xs"
                         maxLength={100}
+                        disabled={atLimit}
                       />
                       <button
                         type="submit"
-                        disabled={creating || !newName.trim()}
+                        disabled={creating || !newName.trim() || atLimit}
                         className="rounded-md bg-surface-2 p-1.5 text-ink hover:bg-hairline disabled:opacity-50"
                       >
                         {creating ? (
@@ -214,6 +219,11 @@ export default function Sidebar({
                         )}
                       </button>
                     </div>
+                    {atLimit && (
+                      <p className="mt-1 font-caption text-muted">
+                        Upgrade your plan to add more workspaces
+                      </p>
+                    )}
                   </form>
                 </div>
               )}

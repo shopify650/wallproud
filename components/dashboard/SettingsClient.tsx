@@ -8,10 +8,10 @@ import { updateWorkspace as updateWorkspaceAction, deleteWorkspace as deleteWork
 import type { Workspace } from "@/types/database";
 
 export default function SettingsClient({
-  email, fullName, workspaceName, workspaceSlug, plan, workspaces, currentWorkspaceId,
+  email, fullName, workspaceName, workspaceSlug, plan, workspaces, currentWorkspaceId, maxWorkspaces,
 }: {
   email: string; fullName: string; workspaceName: string; workspaceSlug: string; plan: string;
-  workspaces: Workspace[]; currentWorkspaceId: string;
+  workspaces: Workspace[]; currentWorkspaceId: string; maxWorkspaces: number;
 }) {
   const [name, setName] = useState(fullName);
   const [loading, setLoading] = useState(false);
@@ -21,6 +21,8 @@ export default function SettingsClient({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
+
+  const atLimit = workspaces.length >= maxWorkspaces;
 
   async function handleProfileSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -100,19 +102,27 @@ export default function SettingsClient({
 
       <div className="card-hairline p-6">
         <div className="flex items-center justify-between">
-          <p className="font-body-sm text-ink">Workspaces ({workspaces.length})</p>
+          <div>
+            <p className="font-body-sm text-ink">Workspaces ({workspaces.length}/{maxWorkspaces})</p>
+            {atLimit && (
+              <p className="font-caption mt-0.5 text-muted">
+                Upgrade your plan to add more workspaces
+              </p>
+            )}
+          </div>
           <form onSubmit={handleCreateWorkspace} className="flex gap-2">
             <input
               type="text"
               value={newWorkspaceName}
               onChange={(e) => setNewWorkspaceName(e.target.value)}
-              placeholder="New workspace..."
+              placeholder={atLimit ? "Limit reached" : "New workspace..."}
               className="input-field py-1.5 text-xs"
               maxLength={100}
+              disabled={atLimit}
             />
             <button
               type="submit"
-              disabled={creating || !newWorkspaceName.trim()}
+              disabled={creating || !newWorkspaceName.trim() || atLimit}
               className="btn-primary py-1.5 px-3"
             >
               <Plus className="h-3.5 w-3.5" />

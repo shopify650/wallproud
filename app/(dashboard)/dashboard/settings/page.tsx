@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getUserWorkspaces, getCurrentWorkspace } from "@/lib/auth-utils";
+import { getUserWorkspaces, getCurrentWorkspace, getPlanLimits } from "@/lib/auth-utils";
 import SettingsClient from "@/components/dashboard/SettingsClient";
 
 export default async function SettingsPage() {
@@ -25,6 +25,7 @@ export default async function SettingsPage() {
   if (!profile || workspaces.length === 0) redirect("/login");
 
   const activeWorkspace = currentWorkspace || workspaces[0];
+  const planLimits = getPlanLimits((profile.plan as any) || "free");
 
   return (
     <SettingsClient
@@ -35,6 +36,7 @@ export default async function SettingsPage() {
       plan={profile.plan}
       workspaces={workspaces}
       currentWorkspaceId={activeWorkspace.id}
+      maxWorkspaces={planLimits.maxWorkspaces}
     />
   );
 }
