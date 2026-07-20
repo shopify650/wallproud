@@ -12,7 +12,7 @@ import {
   Settings,
   Menu,
   X,
-  Sparkles,
+  ArrowUpRight,
   Globe,
   ChevronDown,
   Plus,
@@ -154,7 +154,7 @@ export default function Sidebar({
                 href="/pricing"
                 className="flex items-center gap-1 font-caption text-accent hover:underline"
               >
-                <Sparkles className="h-3 w-3" />
+                <ArrowUpRight className="h-3 w-3" />
                 Upgrade
               </Link>
             )}

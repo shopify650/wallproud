@@ -9,7 +9,7 @@ import {
   ArrowRight,
   Star,
   Upload,
-  Sparkles,
+  ArrowUpRight,
   Link2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -308,7 +308,7 @@ async function DashboardContent() {
                 className="flex items-center gap-4 card-hairline p-4 transition hover:bg-surface-2"
                 >
                   <div className="rounded-lg bg-surface-1 p-2">
-                    <Sparkles className="h-5 w-5 text-muted" />
+                    <ArrowUpRight className="h-5 w-5 text-muted" />
                   </div>
                   <div>
                     <p className="font-body-sm text-ink">Upgrade Plan</p>
