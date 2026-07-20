@@ -134,25 +134,49 @@ create table if not exists public.collection_requests (
 -- ----------------------------------------------------------------------------
 -- 4. INDEXES
 -- ----------------------------------------------------------------------------
+drop index if exists public.idx_users_stripe_customer_id;
 create index idx_users_stripe_customer_id on public.users(stripe_customer_id);
 
+drop index if exists public.idx_workspaces_user_id;
 create index idx_workspaces_user_id    on public.workspaces(user_id);
+
+drop index if exists public.idx_workspaces_slug;
 create index idx_workspaces_slug       on public.workspaces(slug);
 
+drop index if exists public.idx_testimonials_workspace_id;
 create index idx_testimonials_workspace_id on public.testimonials(workspace_id);
+
+drop index if exists public.idx_testimonials_status;
 create index idx_testimonials_status       on public.testimonials(status);
+
+drop index if exists public.idx_testimonials_tags;
 create index idx_testimonials_tags         on public.testimonials using gin(tags);
+
+drop index if exists public.idx_testimonials_created_at;
 create index idx_testimonials_created_at   on public.testimonials(created_at desc);
+
+drop index if exists public.idx_testimonials_source;
 create index idx_testimonials_source       on public.testimonials(source);
+
+drop index if exists public.idx_testimonials_featured;
 create index idx_testimonials_featured     on public.testimonials(featured);
 
+drop index if exists public.idx_widgets_workspace_id;
 create index idx_widgets_workspace_id on public.widgets(workspace_id);
 
+drop index if exists public.idx_collections_workspace_id;
 create index idx_collections_workspace_id on public.collections(workspace_id);
+
+drop index if exists public.idx_collections_share_url;
 create index idx_collections_share_url    on public.collections(share_url);
 
+drop index if exists public.idx_collection_requests_workspace_id;
 create index idx_collection_requests_workspace_id on public.collection_requests(workspace_id);
+
+drop index if exists public.idx_collection_requests_token;
 create index idx_collection_requests_token        on public.collection_requests(token);
+
+drop index if exists public.idx_collection_requests_status;
 create index idx_collection_requests_status       on public.collection_requests(status);
 
 -- ----------------------------------------------------------------------------
