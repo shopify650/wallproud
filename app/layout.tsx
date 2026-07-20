@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "WallProud — Collect & Display Testimonials",
   description: "Collect, manage, and showcase customer testimonials as beautiful embeddable widgets.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
