@@ -147,8 +147,21 @@ export default function Sidebar({
 
         {/* Footer */}
         <div className="border-t border-hairline px-4 py-4">
+          <div className="flex items-center justify-between">
+            <PlanBadge plan={user.plan} />
+            {user.plan === "free" && (
+              <Link
+                href="/pricing"
+                className="flex items-center gap-1 font-caption text-accent hover:underline"
+              >
+                <Sparkles className="h-3 w-3" />
+                Upgrade
+              </Link>
+            )}
+          </div>
+
           {workspace && (
-            <div className="mb-3">
+            <div className="mt-3">
               <button
                 onClick={() => setShowSwitcher(!showSwitcher)}
                 disabled={switchingId !== null}
@@ -229,19 +242,6 @@ export default function Sidebar({
               )}
             </div>
           )}
-
-          <div className="flex items-center justify-between">
-            <PlanBadge plan={user.plan} />
-            {user.plan === "free" && (
-              <Link
-                href="/pricing"
-                className="flex items-center gap-1 font-caption text-accent hover:underline"
-              >
-                <Sparkles className="h-3 w-3" />
-                Upgrade
-              </Link>
-            )}
-          </div>
         </div>
       </aside>
     </>
