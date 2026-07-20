@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentWorkspace } from "@/lib/auth-utils";
 import CollectionsClient from "@/components/dashboard/CollectionsClient";
 
 export type CollectionRequest = {
@@ -28,12 +29,7 @@ export default async function CollectionsPage() {
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .limit(1)
-    .single();
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) redirect("/login");
 

@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentWorkspace } from "@/lib/auth-utils";
 import type { CollectWidgetRow } from "@/lib/supabase/types";
 
 async function getWorkspaceId(): Promise<string> {
@@ -10,12 +11,7 @@ async function getWorkspaceId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) throw new Error("Workspace not found");
   return workspace.id;

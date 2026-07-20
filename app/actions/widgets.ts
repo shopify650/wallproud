@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getPlanLimits } from "@/lib/auth-utils";
+import { getPlanLimits, getCurrentWorkspace } from "@/lib/auth-utils";
 import { getDefaultConfig } from "@/lib/widgets";
 import type { WidgetConfig, WidgetType } from "@/types";
 
@@ -21,12 +21,7 @@ async function getWorkspaceAndUser(supabase: SupabaseClient) {
     .eq("id", user.id)
     .single();
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) throw new Error("Workspace not found");
 

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getCurrentWorkspace } from "@/lib/auth-utils";
 import CollectWidgetClient from "./CollectWidgetClient";
 
 export default async function CollectWidgetPage() {
@@ -8,12 +9,7 @@ export default async function CollectWidgetPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) redirect("/login");
 

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import type { User, Workspace } from "@/types/database";
 import type { PlanType, PlanLimits } from "@/types";
 
@@ -93,7 +94,7 @@ export async function requireAuth(): Promise<User> {
   return user;
 }
 
-export async function getCurrentWorkspace(activeWorkspaceId?: string | null): Promise<Workspace | null> {
+export const getCurrentWorkspace = cache(async (activeWorkspaceId?: string | null): Promise<Workspace | null> => {
   const user = await getUser();
   if (!user) return null;
 
@@ -102,13 +103,8 @@ export async function getCurrentWorkspace(activeWorkspaceId?: string | null): Pr
   let targetId = activeWorkspaceId;
 
   if (!targetId) {
-    try {
-      const { cookies } = await import("next/headers");
-      const cookieStore = await cookies();
-      targetId = cookieStore.get("active_workspace_id")?.value || null;
-    } catch {
-      targetId = null;
-    }
+    const cookieStore = await cookies();
+    targetId = cookieStore.get("active_workspace_id")?.value || null;
   }
 
   if (targetId) {
@@ -131,7 +127,7 @@ export async function getCurrentWorkspace(activeWorkspaceId?: string | null): Pr
     .single();
 
   return workspace;
-}
+});
 
 export async function getUserWorkspaces(): Promise<Workspace[]> {
   const user = await getUser();

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getUserWorkspaces } from "@/lib/auth-utils";
+import { getUserWorkspaces, getCurrentWorkspace } from "@/lib/auth-utils";
 import SettingsClient from "@/components/dashboard/SettingsClient";
 
 export default async function SettingsPage() {
@@ -17,21 +17,24 @@ export default async function SettingsPage() {
     .eq("id", authUser.id)
     .single();
 
-  const workspaces = await getUserWorkspaces();
+  const [workspaces, currentWorkspace] = await Promise.all([
+    getUserWorkspaces(),
+    getCurrentWorkspace(),
+  ]);
 
   if (!profile || workspaces.length === 0) redirect("/login");
 
-  const currentWorkspace = workspaces[0];
+  const activeWorkspace = currentWorkspace || workspaces[0];
 
   return (
     <SettingsClient
       email={authUser.email || ""}
       fullName={profile.full_name || ""}
-      workspaceName={currentWorkspace.name}
-      workspaceSlug={currentWorkspace.slug}
+      workspaceName={activeWorkspace.name}
+      workspaceSlug={activeWorkspace.slug}
       plan={profile.plan}
       workspaces={workspaces}
-      currentWorkspaceId={currentWorkspace.id}
+      currentWorkspaceId={activeWorkspace.id}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentWorkspace } from "@/lib/auth-utils";
 import TestimonialsClient from "./TestimonialsClient";
 
 const ITEMS_PER_PAGE = 20;
@@ -18,12 +19,7 @@ async function TestimonialsData({
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) redirect("/login");
 

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentWorkspace } from "@/lib/auth-utils";
 import ImportClient from "@/components/dashboard/ImportClient";
 
 export default async function ImportPage() {
@@ -10,12 +11,7 @@ export default async function ImportPage() {
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) redirect("/login");
 

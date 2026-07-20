@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getPlanLimits } from "@/lib/auth-utils";
+import { getPlanLimits, getCurrentWorkspace } from "@/lib/auth-utils";
 import WidgetsListClient from "@/components/widgets/WidgetsListClient";
 
 export default async function WidgetsPage() {
@@ -17,12 +17,7 @@ export default async function WidgetsPage() {
     .eq("id", authUser.id)
     .single();
 
-  const { data: workspaces } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("user_id", authUser.id)
-    .order("created_at", { ascending: true });
-  const workspace = workspaces?.[0] || null;
+  const workspace = await getCurrentWorkspace();
 
   if (!workspace) redirect("/login");
 
