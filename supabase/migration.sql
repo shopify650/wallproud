@@ -182,14 +182,17 @@ create index idx_collection_requests_status       on public.collection_requests(
 -- ----------------------------------------------------------------------------
 -- 5. UPDATED_AT TRIGGERS
 -- ----------------------------------------------------------------------------
+drop trigger if exists handle_workspaces_updated_at on public.workspaces;
 create trigger handle_workspaces_updated_at
   before update on public.workspaces
   for each row execute function handle_updated_at();
 
+drop trigger if exists handle_testimonials_updated_at on public.testimonials;
 create trigger handle_testimonials_updated_at
   before update on public.testimonials
   for each row execute function handle_updated_at();
 
+drop trigger if exists handle_widgets_updated_at on public.widgets;
 create trigger handle_widgets_updated_at
   before update on public.widgets
   for each row execute function handle_updated_at();
@@ -209,36 +212,44 @@ alter table public.collection_requests enable row level security;
 -- ----------------------------------------------------------------------------
 
 -- 7a. USERS
+drop policy if exists "Users can view own profile" on public.users;
 create policy "Users can view own profile"
   on public.users for select
   using (id = auth.uid());
 
+drop policy if exists "Users can insert own profile" on public.users;
 create policy "Users can insert own profile"
   on public.users for insert
   with check (id = auth.uid());
 
+drop policy if exists "Users can update own profile" on public.users;
 create policy "Users can update own profile"
   on public.users for update
   using (id = auth.uid());
 
 -- 7b. WORKSPACES
+drop policy if exists "Users can view own workspaces" on public.workspaces;
 create policy "Users can view own workspaces"
   on public.workspaces for select
   using (user_id = auth.uid());
 
+drop policy if exists "Users can create workspaces" on public.workspaces;
 create policy "Users can create workspaces"
   on public.workspaces for insert
   with check (user_id = auth.uid());
 
+drop policy if exists "Users can update own workspaces" on public.workspaces;
 create policy "Users can update own workspaces"
   on public.workspaces for update
   using (user_id = auth.uid());
 
+drop policy if exists "Users can delete own workspaces" on public.workspaces;
 create policy "Users can delete own workspaces"
   on public.workspaces for delete
   using (user_id = auth.uid());
 
 -- 7c. TESTIMONIALS
+drop policy if exists "Users can view testimonials from own workspaces" on public.testimonials;
 create policy "Users can view testimonials from own workspaces"
   on public.testimonials for select
   using (
@@ -247,6 +258,7 @@ create policy "Users can view testimonials from own workspaces"
     )
   );
 
+drop policy if exists "Users can create testimonials in own workspaces" on public.testimonials;
 create policy "Users can create testimonials in own workspaces"
   on public.testimonials for insert
   with check (
@@ -255,6 +267,7 @@ create policy "Users can create testimonials in own workspaces"
     )
   );
 
+drop policy if exists "Users can update testimonials in own workspaces" on public.testimonials;
 create policy "Users can update testimonials in own workspaces"
   on public.testimonials for update
   using (
@@ -263,6 +276,7 @@ create policy "Users can update testimonials in own workspaces"
     )
   );
 
+drop policy if exists "Users can delete testimonials in own workspaces" on public.testimonials;
 create policy "Users can delete testimonials in own workspaces"
   on public.testimonials for delete
   using (
@@ -272,6 +286,7 @@ create policy "Users can delete testimonials in own workspaces"
   );
 
 -- Public insert for collection-based submission
+drop policy if exists "Anyone can submit testimonials via collection" on public.testimonials;
 create policy "Anyone can submit testimonials via collection"
   on public.testimonials for insert
   with check (
@@ -282,6 +297,7 @@ create policy "Anyone can submit testimonials via collection"
   );
 
 -- 7d. WIDGETS
+drop policy if exists "Users can view widgets from own workspaces" on public.widgets;
 create policy "Users can view widgets from own workspaces"
   on public.widgets for select
   using (
@@ -290,6 +306,7 @@ create policy "Users can view widgets from own workspaces"
     )
   );
 
+drop policy if exists "Users can create widgets in own workspaces" on public.widgets;
 create policy "Users can create widgets in own workspaces"
   on public.widgets for insert
   with check (
@@ -298,6 +315,7 @@ create policy "Users can create widgets in own workspaces"
     )
   );
 
+drop policy if exists "Users can update widgets in own workspaces" on public.widgets;
 create policy "Users can update widgets in own workspaces"
   on public.widgets for update
   using (
@@ -306,6 +324,7 @@ create policy "Users can update widgets in own workspaces"
     )
   );
 
+drop policy if exists "Users can delete widgets in own workspaces" on public.widgets;
 create policy "Users can delete widgets in own workspaces"
   on public.widgets for delete
   using (
@@ -315,11 +334,13 @@ create policy "Users can delete widgets in own workspaces"
   );
 
 -- Allow public read for embedded widgets
+drop policy if exists "Anyone can read widgets for embed" on public.widgets;
 create policy "Anyone can read widgets for embed"
   on public.widgets for select
   using (true);
 
 -- 7e. COLLECTIONS
+drop policy if exists "Users can view collections from own workspaces" on public.collections;
 create policy "Users can view collections from own workspaces"
   on public.collections for select
   using (
@@ -328,6 +349,7 @@ create policy "Users can view collections from own workspaces"
     )
   );
 
+drop policy if exists "Users can create collections in own workspaces" on public.collections;
 create policy "Users can create collections in own workspaces"
   on public.collections for insert
   with check (
@@ -336,6 +358,7 @@ create policy "Users can create collections in own workspaces"
     )
   );
 
+drop policy if exists "Users can update collections in own workspaces" on public.collections;
 create policy "Users can update collections in own workspaces"
   on public.collections for update
   using (
@@ -344,6 +367,7 @@ create policy "Users can update collections in own workspaces"
     )
   );
 
+drop policy if exists "Users can delete collections in own workspaces" on public.collections;
 create policy "Users can delete collections in own workspaces"
   on public.collections for delete
   using (
@@ -353,11 +377,13 @@ create policy "Users can delete collections in own workspaces"
   );
 
 -- Allow public read for shareable collection links
+drop policy if exists "Anyone can read shared collections" on public.collections;
 create policy "Anyone can read shared collections"
   on public.collections for select
   using (true);
 
 -- 7f. COLLECTION_REQUESTS
+drop policy if exists "Users can view collection requests from own workspaces" on public.collection_requests;
 create policy "Users can view collection requests from own workspaces"
   on public.collection_requests for select
   using (
@@ -366,6 +392,7 @@ create policy "Users can view collection requests from own workspaces"
     )
   );
 
+drop policy if exists "Users can create collection requests" on public.collection_requests;
 create policy "Users can create collection requests"
   on public.collection_requests for insert
   with check (
@@ -374,6 +401,7 @@ create policy "Users can create collection requests"
     )
   );
 
+drop policy if exists "Users can update collection requests" on public.collection_requests;
 create policy "Users can update collection requests"
   on public.collection_requests for update
   using (
@@ -382,6 +410,7 @@ create policy "Users can update collection requests"
     )
   );
 
+drop policy if exists "Users can delete collection requests" on public.collection_requests;
 create policy "Users can delete collection requests"
   on public.collection_requests for delete
   using (
@@ -410,6 +439,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
@@ -422,6 +452,7 @@ create or replace trigger on_auth_user_created
 -- Marking a link "completed" is done via a SECURITY DEFINER function (below)
 -- so we never grant anon a direct UPDATE on collection_requests.
 
+drop policy if exists "Public can view active collection links" on public.collection_requests;
 create policy "Public can view active collection links"
   on public.collection_requests for select
   using (
@@ -430,6 +461,7 @@ create policy "Public can view active collection links"
     and (expires_at is null or expires_at > now())
   );
 
+drop policy if exists "Public can submit testimonials via active collection links" on public.testimonials;
 create policy "Public can submit testimonials via active collection links"
   on public.testimonials for insert
   with check (
@@ -463,6 +495,7 @@ grant execute on function public.complete_collection_request(text) to anon, auth
 -- ============================================================================
 
 -- Allow anonymous visitors to read only APPROVED testimonials.
+drop policy if exists "Public can read approved testimonials" on public.testimonials;
 create policy "Public can read approved testimonials"
   on public.testimonials for select
   to anon, authenticated
