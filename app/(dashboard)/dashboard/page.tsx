@@ -153,7 +153,7 @@ async function DashboardContent() {
             Welcome back, {firstName}
           </h1>
           <div className="mt-1 flex items-center gap-2">
-            <span className="text-sm text-muted">{profile.plan === "free" ? "Free" : profile.plan === "starter" ? "Starter" : profile.plan === "pro" ? "Pro" : "Agency"} plan</span>
+            <span className="text-sm text-muted">{profile.plan === "free" ? "Free" : profile.plan === "starter" || profile.plan === "pro" ? "Pro" : "Agency"} plan</span>
             <PlanBadge plan={profile.plan} />
           </div>
         </div>
