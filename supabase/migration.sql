@@ -44,7 +44,7 @@ create table if not exists public.workspaces (
   name          text        not null,
   slug          text        not null unique,
   logo_url      text,
-  primary_color text        not null default '#000000',
+  primary_color text        not null default '#6366f1',
   settings      jsonb       not null default '{}'::jsonb,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
