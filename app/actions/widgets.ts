@@ -21,12 +21,12 @@ async function getWorkspaceAndUser(supabase: SupabaseClient) {
     .eq("id", user.id)
     .single();
 
-  const { data: workspace } = await supabase
+  const { data: workspaces } = await supabase
     .from("workspaces")
-    .select("id")
+    .select("*")
     .eq("user_id", user.id)
-    .limit(1)
-    .single();
+    .order("created_at", { ascending: true });
+  const workspace = workspaces?.[0] || null;
 
   if (!workspace) throw new Error("Workspace not found");
 

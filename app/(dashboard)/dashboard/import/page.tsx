@@ -10,12 +10,12 @@ export default async function ImportPage() {
   } = await supabase.auth.getUser();
   if (!authUser) redirect("/login");
 
-  const { data: workspace } = await supabase
+  const { data: workspaces } = await supabase
     .from("workspaces")
-    .select("id, name")
+    .select("*")
     .eq("user_id", authUser.id)
-    .limit(1)
-    .single();
+    .order("created_at", { ascending: true });
+  const workspace = workspaces?.[0] || null;
 
   if (!workspace) redirect("/login");
 

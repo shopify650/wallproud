@@ -93,20 +93,59 @@ export async function requireAuth(): Promise<User> {
   return user;
 }
 
-export async function getCurrentWorkspace(): Promise<Workspace | null> {
+export async function getCurrentWorkspace(activeWorkspaceId?: string | null): Promise<Workspace | null> {
   const user = await getUser();
   if (!user) return null;
 
   const supabase = await createClient();
 
+  let targetId = activeWorkspaceId;
+
+  if (!targetId) {
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      targetId = cookieStore.get("active_workspace_id")?.value || null;
+    } catch {
+      targetId = null;
+    }
+  }
+
+  if (targetId) {
+    const { data: workspace } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("id", targetId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (workspace) return workspace;
+  }
+
   const { data: workspace } = await supabase
     .from("workspaces")
     .select("*")
     .eq("user_id", user.id)
+    .order("created_at", { ascending: true })
     .limit(1)
     .single();
 
   return workspace;
+}
+
+export async function getUserWorkspaces(): Promise<Workspace[]> {
+  const user = await getUser();
+  if (!user) return [];
+
+  const supabase = await createClient();
+
+  const { data: workspaces } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+
+  return workspaces || [];
 }
 
 export function getPlanLimits(plan: PlanType): PlanLimits {

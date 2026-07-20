@@ -17,12 +17,12 @@ export default async function WidgetsPage() {
     .eq("id", authUser.id)
     .single();
 
-  const { data: workspace } = await supabase
+  const { data: workspaces } = await supabase
     .from("workspaces")
-    .select("id")
+    .select("*")
     .eq("user_id", authUser.id)
-    .limit(1)
-    .single();
+    .order("created_at", { ascending: true });
+  const workspace = workspaces?.[0] || null;
 
   if (!workspace) redirect("/login");
 

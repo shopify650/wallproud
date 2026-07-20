@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,8 +14,12 @@ import {
   X,
   Sparkles,
   Globe,
+  ChevronDown,
+  Plus,
+  Check,
 } from "lucide-react";
-import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { switchWorkspace, createWorkspace } from "@/app/actions/workspaces";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import type { User, Workspace } from "@/types/database";
@@ -33,12 +38,41 @@ const navItems: { label: string; href: string; icon: typeof LayoutDashboard; bad
 export default function Sidebar({
   user,
   workspace,
+  workspaces,
 }: {
   user: User;
   workspace: Workspace | null;
+  workspaces: Workspace[];
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [showSwitcher, setShowSwitcher] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  const handleSwitch = useCallback(async (id: string) => {
+    const res = await switchWorkspace(id);
+    if (res.success) {
+      setShowSwitcher(false);
+    } else {
+      toast.error(res.error || "Failed to switch workspace");
+    }
+  }, []);
+
+  const handleCreate = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setCreating(true);
+    const res = await createWorkspace(newName.trim());
+    setCreating(false);
+    if (res.success && res.data) {
+      await handleSwitch(res.data.id);
+      setNewName("");
+      toast.success("Workspace created");
+    } else {
+      toast.error(res.error || "Failed to create workspace");
+    }
+  }, [newName, handleSwitch]);
 
   return (
     <>
@@ -104,11 +138,56 @@ export default function Sidebar({
         {/* Footer */}
         <div className="border-t border-hairline px-4 py-4">
           {workspace && (
-            <div className="mb-3 rounded-lg px-3 py-2">
-              <p className="font-caption text-muted">Active workspace</p>
-              <p className="font-body-sm truncate text-ink">
-                {workspace.name}
-              </p>
+            <div className="mb-3">
+              <button
+                onClick={() => setShowSwitcher(!showSwitcher)}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-surface-1"
+              >
+                <div className="min-w-0">
+                  <p className="font-caption text-muted">Active workspace</p>
+                  <p className="font-body-sm truncate text-ink">
+                    {workspace.name}
+                  </p>
+                </div>
+                <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition-transform ${showSwitcher ? "rotate-180" : ""}`} />
+              </button>
+
+              {showSwitcher && (
+                <div className="mt-2 rounded-lg border border-hairline bg-surface-1">
+                  <div className="max-h-48 overflow-y-auto p-1">
+                    {workspaces.map((ws) => (
+                      <button
+                        key={ws.id}
+                        onClick={() => handleSwitch(ws.id)}
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-2"
+                      >
+                        <span className="flex-1 truncate font-body-sm text-ink">{ws.name}</span>
+                        {ws.id === workspace.id && <Check className="h-3.5 w-3.5 text-success" />}
+                      </button>
+                    ))}
+                  </div>
+
+                  <form onSubmit={handleCreate} className="border-t border-hairline p-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        placeholder="New workspace..."
+                        className="input-field flex-1 py-1.5 text-xs"
+                        maxLength={100}
+                      />
+                      <button
+                        type="submit"
+                        disabled={creating || !newName.trim()}
+                        className="rounded-md bg-surface-2 p-1.5 text-ink hover:bg-hairline disabled:opacity-50"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           )}
 

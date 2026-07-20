@@ -5,11 +5,11 @@ export async function getDashboardData(userId: string) {
 
   const [profileResult, workspaceResult] = await Promise.all([
     supabase.from("users").select("*").eq("id", userId).single(),
-    supabase.from("workspaces").select("*").eq("user_id", userId).limit(1).single(),
+    supabase.from("workspaces").select("*").eq("user_id", userId).order("created_at", { ascending: true }).limit(1),
   ]);
 
   return {
     profile: profileResult.data,
-    workspace: workspaceResult.data,
+    workspace: workspaceResult.data?.[0] || null,
   };
 }

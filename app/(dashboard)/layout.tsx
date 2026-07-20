@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
@@ -18,9 +19,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const [profileResult, workspaceResult] = await Promise.all([
+  const cookieStore = await cookies();
+  const activeWorkspaceId = cookieStore.get("active_workspace_id")?.value || null;
+
+  const [profileResult, workspacesResult] = await Promise.all([
     supabase.from("users").select("*").eq("id", authUser.id).single(),
-    supabase.from("workspaces").select("*").eq("user_id", authUser.id).limit(1).single(),
+    supabase.from("workspaces").select("*").eq("user_id", authUser.id).order("created_at", { ascending: true }),
   ]);
 
   let profile = profileResult.data;
@@ -46,13 +50,18 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const workspace = workspaceResult.data;
+  const workspaces = workspacesResult.data || [];
+  let activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId) || workspaces[0] || null;
+
+  if (!activeWorkspace && workspaces.length === 0) {
+    redirect("/login");
+  }
 
   return (
     <div className="flex min-h-screen bg-canvas">
-      <Sidebar user={profile} workspace={workspace} />
+      <Sidebar user={profile} workspace={activeWorkspace} workspaces={workspaces} />
       <div className="flex flex-1 flex-col lg:pl-64">
-        <DashboardHeader workspace={workspace} />
+        <DashboardHeader workspace={activeWorkspace} />
         <main className="flex-1 px-6 py-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
