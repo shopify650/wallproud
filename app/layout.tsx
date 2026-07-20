@@ -12,9 +12,9 @@ export const metadata: Metadata = {
   title: "WallProud — Collect & Display Testimonials",
   description: "Collect, manage, and showcase customer testimonials as beautiful embeddable widgets.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: "/logo.gif",
+    shortcut: "/logo.gif",
+    apple: "/logo.gif",
   },
 };
 
