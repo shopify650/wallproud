@@ -17,6 +17,7 @@ import {
   ChevronDown,
   Plus,
   Check,
+  Loader2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { switchWorkspace, createWorkspace } from "@/app/actions/workspaces";
@@ -49,15 +50,21 @@ export default function Sidebar({
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
+  const [switchingId, setSwitchingId] = useState<string | null>(null);
 
   const handleSwitch = useCallback(async (id: string) => {
-    const res = await switchWorkspace(id);
-    if (res.success) {
+    if (id === workspace?.id) {
       setShowSwitcher(false);
-    } else {
+      return;
+    }
+    setSwitchingId(id);
+    setShowSwitcher(false);
+    const res = await switchWorkspace(id);
+    setSwitchingId(null);
+    if (!res.success) {
       toast.error(res.error || "Failed to switch workspace");
     }
-  }, []);
+  }, [workspace?.id]);
 
   const handleCreate = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +73,12 @@ export default function Sidebar({
     const res = await createWorkspace(newName.trim());
     setCreating(false);
     if (res.success && res.data) {
-      await handleSwitch(res.data.id);
       setNewName("");
       toast.success("Workspace created");
     } else {
       toast.error(res.error || "Failed to create workspace");
     }
-  }, [newName, handleSwitch]);
+  }, [newName]);
 
   return (
     <>
@@ -141,7 +147,8 @@ export default function Sidebar({
             <div className="mb-3">
               <button
                 onClick={() => setShowSwitcher(!showSwitcher)}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-surface-1"
+                disabled={switchingId !== null}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-surface-1 disabled:opacity-50"
               >
                 <div className="min-w-0">
                   <p className="font-caption text-muted">Active workspace</p>
@@ -149,22 +156,40 @@ export default function Sidebar({
                     {workspace.name}
                   </p>
                 </div>
-                <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition-transform ${showSwitcher ? "rotate-180" : ""}`} />
+                {switchingId ? (
+                  <Loader2 className="h-4 w-4 shrink-0 text-muted animate-spin" />
+                ) : (
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition-transform ${showSwitcher ? "rotate-180" : ""}`} />
+                )}
               </button>
 
               {showSwitcher && (
                 <div className="mt-2 rounded-lg border border-hairline bg-surface-1">
                   <div className="max-h-48 overflow-y-auto p-1">
-                    {workspaces.map((ws) => (
-                      <button
-                        key={ws.id}
-                        onClick={() => handleSwitch(ws.id)}
-                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-2"
-                      >
-                        <span className="flex-1 truncate font-body-sm text-ink">{ws.name}</span>
-                        {ws.id === workspace.id && <Check className="h-3.5 w-3.5 text-success" />}
-                      </button>
-                    ))}
+                    {workspaces.map((ws) => {
+                      const isActive = ws.id === workspace?.id;
+                      const isSwitching = ws.id === switchingId;
+                      return (
+                        <button
+                          key={ws.id}
+                          onClick={() => handleSwitch(ws.id)}
+                          disabled={isSwitching}
+                          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-2 disabled:opacity-50"
+                        >
+                          <span className="flex-1 truncate font-body-sm text-ink">
+                            {isSwitching ? (
+                              <span className="flex items-center gap-2">
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                Switching...
+                              </span>
+                            ) : (
+                              ws.name
+                            )}
+                          </span>
+                          {isActive && !isSwitching && <Check className="h-3.5 w-3.5 text-success" />}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <form onSubmit={handleCreate} className="border-t border-hairline p-2">
@@ -182,7 +207,11 @@ export default function Sidebar({
                         disabled={creating || !newName.trim()}
                         className="rounded-md bg-surface-2 p-1.5 text-ink hover:bg-hairline disabled:opacity-50"
                       >
-                        <Plus className="h-3.5 w-3.5" />
+                        {creating ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Plus className="h-3.5 w-3.5" />
+                        )}
                       </button>
                     </div>
                   </form>

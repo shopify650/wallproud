@@ -168,9 +168,6 @@ export async function switchWorkspace(
 ): Promise<ActionResponse> {
   if (!workspaceId) return { success: false, error: "Missing workspace id" };
 
-  const user = await getUser();
-  if (!user) return { success: false, error: "Unauthorized" };
-
   const supabase = await createClient();
 
   const { data: existing } = await supabase
@@ -179,7 +176,15 @@ export async function switchWorkspace(
     .eq("id", workspaceId)
     .single();
 
-  if (!existing || existing.user_id !== user.id) {
+  if (!existing) {
+    return { success: false, error: "Workspace not found" };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || existing.user_id !== user.id) {
     return { success: false, error: "Workspace not found" };
   }
 
