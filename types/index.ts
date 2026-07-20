@@ -133,7 +133,7 @@ export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
     apiAccess: true,
   },
   agency: {
-    maxWorkspaces: 100,
+    maxWorkspaces: 50,
     maxTestimonials: 10000,
     maxWidgets: 100,
     maxCollections: 100,
