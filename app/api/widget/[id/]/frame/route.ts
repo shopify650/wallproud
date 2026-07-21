@@ -10,7 +10,7 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<Record<string, string>> },
 ) {
-  const { widgetId } = await context.params;
+  const { id: widgetId } = await context.params;
 
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
