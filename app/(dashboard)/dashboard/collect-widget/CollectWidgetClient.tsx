@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import {
-  Plus, Trash2, Copy, Check, Globe, Code2, Settings,
-  Eye, MousePointerClick, Timer, X,
+  Plus, Trash2, Copy, Check, Code2, Settings,
+  Eye, MousePointerClick, Timer,
 } from "lucide-react";
 import type { CollectWidgetRow } from "@/lib/supabase/types";
 import { upsertCollectWidget, deleteCollectWidget } from "@/app/actions/collect-widgets";
@@ -42,7 +42,6 @@ interface FormState {
   show_confetti: boolean;
   show_powered_by: boolean;
   auto_approve_5star: boolean;
-  allowed_domains: string[];
   is_active: boolean;
 }
 
@@ -74,7 +73,6 @@ const defaultForm: FormState = {
   show_confetti: true,
   show_powered_by: true,
   auto_approve_5star: false,
-  allowed_domains: [],
   is_active: true,
 };
 
@@ -108,7 +106,6 @@ function widgetToForm(w: CollectWidgetRow): FormState {
     show_confetti: w.show_confetti,
     show_powered_by: w.show_powered_by,
     auto_approve_5star: w.auto_approve_5star,
-    allowed_domains: w.allowed_domains || [],
     is_active: w.is_active,
   };
 }
@@ -118,17 +115,18 @@ export default function CollectWidgetClient({
   workspaceName,
   workspaceColor,
   widgets,
+  plan,
 }: {
   workspaceId: string;
   workspaceName: string;
   workspaceColor: string;
   widgets: CollectWidgetRow[];
+  plan: string;
 }) {
   const [form, setForm] = useState<FormState>(defaultForm);
   const [saving, setSaving] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<"settings" | "embed">("settings");
-  const [domainInput, setDomainInput] = useState("");
   const [copied, setCopied] = useState(false);
 
   const selectedWidget = widgets.find((w) => w.id === selectedId);
@@ -136,19 +134,25 @@ export default function CollectWidgetClient({
   useEffect(() => {
     if (widgets.length > 0 && !selectedId) {
       setSelectedId(widgets[0].id);
-      setForm(widgetToForm(widgets[0]));
+      setForm({ ...widgetToForm(widgets[0]), show_powered_by: true });
     }
   }, [widgets, selectedId]);
 
   const selectWidget = useCallback((id: string) => {
     setSelectedId(id);
     const w = widgets.find((x) => x.id === id);
-    if (w) setForm(widgetToForm(w));
+    if (w) setForm({ ...widgetToForm(w), show_powered_by: true });
   }, [widgets]);
 
   const update = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  }, []);
+    setForm((prev) => {
+      const next = { ...prev, [key]: value };
+      if (plan === "free" && key === "show_powered_by") {
+        next.show_powered_by = true;
+      }
+      return next;
+    });
+  }, [plan]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -170,18 +174,6 @@ export default function CollectWidgetClient({
     setSelectedId(null);
     setForm(defaultForm);
   }, []);
-
-  const addDomain = useCallback(() => {
-    const d = domainInput.trim().toLowerCase().replace(/^https?:\/\//, "");
-    if (!d) return;
-    if (form.allowed_domains.includes(d)) return toast.error("Domain already added");
-    update("allowed_domains", [...form.allowed_domains, d]);
-    setDomainInput("");
-  }, [domainInput, form.allowed_domains, update]);
-
-  const removeDomain = useCallback((d: string) => {
-    update("allowed_domains", form.allowed_domains.filter((x) => x !== d));
-  }, [form.allowed_domains, update]);
 
   const copyEmbed = useCallback(async () => {
     const origin = window.location.origin;
@@ -526,45 +518,18 @@ export default function CollectWidgetClient({
               <label className="flex items-center justify-between">
                 <div>
                   <span className="font-body-sm text-ink">Show "Powered by WallProud"</span>
+                  {plan === "free" && (
+                    <span className="ml-2 font-caption text-muted">(required on free plan)</span>
+                  )}
                 </div>
                 <input
                   type="checkbox"
                   checked={form.show_powered_by}
                   onChange={(e) => update("show_powered_by", e.target.checked)}
-                  className="h-4 w-4 rounded border-hairline"
+                  disabled={plan === "free"}
+                  className="h-4 w-4 rounded border-hairline disabled:opacity-50"
                 />
               </label>
-              <div>
-                <label className="font-caption text-muted">Allowed domains (empty = all domains)</label>
-                <div className="mt-1 flex items-center gap-2">
-                  <input
-                    value={domainInput}
-                    onChange={(e) => setDomainInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addDomain())}
-                    className="input-field flex-1"
-                    placeholder="mywebsite.com"
-                  />
-                  <button onClick={addDomain} className="btn-secondary text-xs">
-                    Add
-                  </button>
-                </div>
-                {form.allowed_domains.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {form.allowed_domains.map((d) => (
-                      <span
-                        key={d}
-                        className="inline-flex items-center gap-1 rounded-pill bg-surface-2 px-3 py-1 font-caption text-muted"
-                      >
-                        <Globe className="h-3 w-3" />
-                        {d}
-                        <button onClick={() => removeDomain(d)} className="ml-1 hover:text-ink">
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Status */}

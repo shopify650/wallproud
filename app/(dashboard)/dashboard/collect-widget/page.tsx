@@ -13,6 +13,12 @@ export default async function CollectWidgetPage() {
 
   if (!workspace) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("users")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+
   const { data: widgets } = await supabase
     .from("collect_widgets")
     .select("*")
@@ -25,6 +31,7 @@ export default async function CollectWidgetPage() {
       workspaceName={workspace.name}
       workspaceColor={workspace.primary_color}
       widgets={(widgets || []) as any[]}
+      plan={(profile?.plan as string) || "free"}
     />
   );
 }

@@ -46,7 +46,6 @@ const upsertSchema = z.object({
   show_confetti: z.boolean().default(true),
   show_powered_by: z.boolean().default(true),
   auto_approve_5star: z.boolean().default(false),
-  allowed_domains: z.array(z.string()).default([]),
   is_active: z.boolean().default(true),
 });
 
