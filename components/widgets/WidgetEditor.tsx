@@ -235,47 +235,45 @@ export default function Wallproud(props) {
     React.useEffect(() => {
         if (!widgetId) return
         fetch("${embedOrigin}/embed/" + widgetId + ".js")
-            .then(res => {
+            .then(function(res) {
                 if (!res.ok) throw new Error("HTTP " + res.status)
                 return res.text()
             })
-            .then(code => {
-                const marker = "root.innerHTML='"
-                const start = code.indexOf(marker)
+            .then(function(code) {
+                var marker = "root.innerHTML='"
+                var start = code.indexOf(marker)
                 if (start === -1) {
                     console.error("WallProud: marker not found")
                     setError(true)
                     return
                 }
-                const afterStart = start + marker.length
-                let end = code.indexOf("';", afterStart)
+                var afterStart = start + marker.length
+                var end = code.indexOf("';", afterStart)
                 if (end === -1) end = code.indexOf("';", afterStart + 1)
-                let html = code.slice(afterStart, end)
+                var html = code.slice(afterStart, end)
                 html = html.split("\\\\n").join("")
                 html = html.split('\\\\"').join('"')
                 html = html.split("\\\\'").join("'")
                 setContent(html)
             })
-            .catch(err => {
+            .catch(function(err) {
                 console.error("WallProud widget load error:", err)
                 setError(true)
             })
     }, [widgetId])
 
     if (error) {
-        return <p style={{ color: "#666", padding: 24 }}>Failed to load widget</p>
+        return React.createElement("p", { style: { color: "#666", padding: 24 } }, "Failed to load widget")
     }
 
     if (!content) {
-        return <p style={{ color: "#999", padding: 24 }}>Loading widget...</p>
+        return React.createElement("p", { style: { color: "#999", padding: 24 } }, "Loading widget...")
     }
 
-    return (
-        <div
-            dangerouslySetInnerHTML={{ __html: content }}
-            style={{ width: "100%", ...props.style }}
-        />
-    )
+    return React.createElement("div", {
+        dangerouslySetInnerHTML: { __html: content },
+        style: { width: "100%", ...props.style }
+    })
 }
 
 addPropertyControls(Wallproud, {
