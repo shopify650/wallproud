@@ -32,7 +32,7 @@ const plans = [
       "20 widgets",
       "10 import sources",
       "      3 workspaces",
-      "15 team members (soon)",
+      "3 team members",
       "Remove branding",
       "Advanced analytics",
       "Priority support",
