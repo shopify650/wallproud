@@ -697,6 +697,15 @@ addPropertyControls(Wallproud, {
             </button>
           </div>
         </div>
+
+        <div className="mb-2 rounded-lg bg-surface-2 p-3">
+          <p className="font-caption text-muted">
+            {embedTab === "script" && "Paste this script tag anywhere in your website's HTML. The widget will load automatically."}
+            {embedTab === "iframe" && "Use this iframe code to embed the widget in a specific container. Adjust the height as needed."}
+            {embedTab === "framer" && "Paste this into a Framer Code Component. The widget ID is pre-filled."}
+          </p>
+        </div>
+
         <pre className="overflow-x-auto rounded-lg bg-surface-1 p-3 font-mono text-xs text-ink">
           <code>{embedCode}</code>
         </pre>
