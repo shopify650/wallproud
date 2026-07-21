@@ -240,13 +240,18 @@ export default function Wallproud(props) {
                 return res.text()
             })
             .then(code => {
-                const start = code.indexOf("root.innerHTML='")
-                if (start === -1) throw new Error("No root.innerHTML found")
-                const afterStart = start + "root.innerHTML='".length
+                const marker = "root.innerHTML='"
+                const start = code.indexOf(marker)
+                if (start === -1) {
+                    console.error("WallProud: marker not found in embed script")
+                    setError(true)
+                    return
+                }
+                const afterStart = start + marker.length
                 let end = code.indexOf("';", afterStart)
-                if (end === -1) end = code.length - 1
+                if (end === -1) end = code.indexOf("';", afterStart + 1)
                 let html = code.slice(afterStart, end)
-                html = html.replace(/\\\\n/g, "").replace(/\\\\"/g, '"').replace(/\\\\'/g, "'")
+                html = html.replace(/\\\\n/g, "").replace(/\\\\"/g, '"').replace(/\\\\'/g, "'").replace(/\\\\/g, "\\")
                 setContent(html)
             })
             .catch(err => {
