@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Sparkles, ArrowRight, Clock } from "lucide-react";
+import { Check, Sparkles, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const plans = [
@@ -31,8 +31,8 @@ const plans = [
       "20 collection links",
       "20 widgets",
       "10 import sources",
-      "3 workspaces",
-      "3 team members",
+      "      3 workspaces",
+      "15 team members (soon)",
       "Remove branding",
       "Advanced analytics",
       "Priority support",
@@ -52,8 +52,8 @@ const plans = [
       "100 collection links",
       "100 widgets",
       "50 import sources",
-      "15 workspaces",
-      "15 team members",
+      "      15 workspaces",
+      "15 team members (soon)",
       "White-label option",
       "Advanced analytics",
       "Dedicated support",
@@ -62,28 +62,6 @@ const plans = [
     cta: "Contact us",
     href: "/signup",
     highlighted: false,
-  },
-  {
-    name: "Team",
-    price: "Soon",
-    period: "",
-    description: "For growing teams that need more power.",
-    features: [
-      "Up to 10,000 testimonials",
-      "50 collection links",
-      "50 widgets",
-      "25 import sources",
-      "10 workspaces",
-      "10 team members",
-      "Remove branding",
-      "Advanced analytics",
-      "Priority support",
-      "Team collaboration tools",
-    ],
-    cta: "Notify me",
-    href: "#",
-    highlighted: false,
-    comingSoon: true,
   },
 ];
 
@@ -126,7 +104,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -139,11 +117,6 @@ export default function PricingPage() {
               {plan.highlighted && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-pill bg-white px-4 py-1 font-caption text-black">
                   Popular
-                </span>
-              )}
-              {plan.comingSoon && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-pill bg-surface-2 px-4 py-1 font-caption text-muted">
-                  <Clock className="h-3 w-3" /> Coming Soon
                 </span>
               )}
               <div className="flex items-center justify-between">
@@ -164,22 +137,15 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              {plan.comingSoon ? (
-                <span className="mt-8 flex items-center justify-center gap-2 rounded-pill bg-surface-2 px-4 py-2.5 font-body-sm text-muted opacity-50 cursor-not-allowed">
-                  <Clock className="h-4 w-4" />
-                  {plan.cta}
-                </span>
-              ) : (
-                <Link
-                  href={plan.href}
-                  className={`mt-8 flex items-center justify-center gap-2 rounded-pill px-4 py-2.5 font-body-sm transition ${
-                    plan.highlighted ? "btn-primary" : "btn-secondary"
-                  }`}
-                >
-                  {plan.cta}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
+              <Link
+                href={plan.href}
+                className={`mt-8 flex items-center justify-center gap-2 rounded-pill px-4 py-2.5 font-body-sm transition ${
+                  plan.highlighted ? "btn-primary" : "btn-secondary"
+                }`}
+              >
+                {plan.cta}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           ))}
         </div>
