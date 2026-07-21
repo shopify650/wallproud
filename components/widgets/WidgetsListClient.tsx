@@ -69,9 +69,15 @@ export default function WidgetsListClient({
   };
 
   const handleCopyFramer = async (id: string) => {
-    const code = `import * as React from "react"
+    const code = `// Get Started: https://www.framer.com/developers
+
+import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
+/**
+ * @framerSupportedLayoutWidth any
+ * @framerSupportedLayoutHeight any
+ */
 export default function Wallproud(props) {
     const containerRef = React.useRef(null)
 

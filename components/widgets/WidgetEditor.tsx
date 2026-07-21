@@ -235,8 +235,12 @@ export default function Wallproud(props) {
         const container = containerRef.current
         if (!container || !widgetId) return
 
-        const src = "${embedOrigin}/embed/" + widgetId + ".js"
-        container.innerHTML = '<script src="' + src + '" async></script>'
+        container.innerHTML = ""
+
+        const script = document.createElement("script")
+        script.src = "${embedOrigin}/embed/" + widgetId + ".js"
+        script.async = true
+        container.appendChild(script)
     }, [widgetId])
 
     return (
