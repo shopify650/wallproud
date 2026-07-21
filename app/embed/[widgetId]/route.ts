@@ -24,8 +24,7 @@ export async function GET(
     .single();
 
   if (!widget) {
-    return new Response("console.error('WallProud: widget not found');", {
-      status: 404,
+    return new Response("console.warn('WallProud: widget not found');", {
       headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300" },
     });
   }
