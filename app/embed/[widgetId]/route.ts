@@ -5,10 +5,28 @@ import { generateEmbedScript } from "@/lib/embed";
 
 export const runtime = "edge";
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ widgetId: string }> },
 ) {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   const { widgetId: rawWidgetId } = await params;
   const widgetId = rawWidgetId.replace(/\.js$/, "");
 
@@ -26,7 +44,7 @@ export async function GET(
 
   if (!widget) {
     return new Response("console.warn('WallProud: widget not found');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300" },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
     });
   }
 
@@ -49,7 +67,7 @@ export async function GET(
 
   if (!testimonials || testimonials.length === 0) {
     return new Response("console.warn('WallProud: no testimonials to display');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300" },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
     });
   }
 
@@ -60,7 +78,7 @@ export async function GET(
 
   if (!script) {
     return new Response("console.warn('WallProud: no approved testimonials');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300" },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
     });
   }
 
@@ -72,7 +90,7 @@ export async function GET(
     headers: {
       "Content-Type": "application/javascript",
       "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
-      "Access-Control-Allow-Origin": "*",
+      ...corsHeaders,
     },
   });
 }

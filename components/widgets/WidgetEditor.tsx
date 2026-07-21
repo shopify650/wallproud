@@ -229,13 +229,40 @@ import { addPropertyControls, ControlType } from "framer"
  */
 export default function Wallproud(props) {
     const { widgetId } = props
-    const origin = "${embedOrigin}"
+    const [content, setContent] = React.useState("")
+    const [error, setError] = React.useState(false)
+
+    React.useEffect(() => {
+        if (!widgetId) return
+        fetch("${embedOrigin}/embed/" + widgetId + ".js")
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to load")
+                return res.text()
+            })
+            .then(code => {
+                const match = code.match(/root\\.innerHTML='([^']+)'/)
+                if (match) {
+                    const html = match[1].replace(/\\\\n/g, "").replace(/\\\\"/g, '"').replace(/\\\\'/g, "'")
+                    setContent(html)
+                } else {
+                    setError(true)
+                }
+            })
+            .catch(() => setError(true))
+    }, [widgetId])
+
+    if (error) {
+        return <p style={{ color: "#666", padding: 24 }}>Failed to load widget</p>
+    }
+
+    if (!content) {
+        return <p style={{ color: "#999", padding: 24 }}>Loading widget...</p>
+    }
 
     return (
-        <iframe
-            src={origin + "/api/widget/" + widgetId + "/frame"}
-            style={{ width: "100%", border: "none", height: "600px", ...props.style }}
-            scrolling="no"
+        <div
+            dangerouslySetInnerHTML={{ __html: content }}
+            style={{ width: "100%", ...props.style }}
         />
     )
 }
