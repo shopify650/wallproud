@@ -6,7 +6,7 @@ const publicDir = path.join(process.cwd(), "public");
 const appDir = path.join(process.cwd(), "app");
 
 async function createFavicon() {
-  const sizes = [16, 32, 48, 64];
+  const sizes = [64, 128, 192, 256];
   const pngBuffers = [];
 
   for (const size of sizes) {
@@ -15,9 +15,6 @@ async function createFavicon() {
       .ensureAlpha()
       .png()
       .toBuffer();
-    
-    const info = await sharp(rgbaPng).metadata();
-    console.log(`Size ${size}: channels=${info.channels}, hasAlpha=${info.hasAlpha}`);
     
     pngBuffers.push({ size, buffer: rgbaPng });
   }
@@ -55,6 +52,12 @@ async function createFavicon() {
 
   fs.writeFileSync(path.join(publicDir, "favicon.ico"), finalIco);
   fs.writeFileSync(path.join(appDir, "favicon.ico"), finalIco);
+
+  fs.writeFileSync(path.join(publicDir, "favicon-192x192.png"), pngBuffers[2].buffer);
+  fs.writeFileSync(path.join(appDir, "favicon-192x192.png"), pngBuffers[2].buffer);
+  fs.writeFileSync(path.join(publicDir, "favicon-512x512.png"), pngBuffers[3].buffer);
+  fs.writeFileSync(path.join(appDir, "favicon-512x512.png"), pngBuffers[3].buffer);
+
   console.log("Created favicon.ico with sizes:", sizes.join(", "));
 }
 
