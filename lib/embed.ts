@@ -161,8 +161,9 @@ export function generateEmbedScript(
     `var root=e.attachShadow({mode:'open'});`,
     `root.innerHTML='${escapedHtml}';`,
     extraJS,
-    `var s=document.currentScript||document.scripts[document.scripts.length-1];`,
-    `s.parentNode.insertBefore(e,s)`,
+    `var s=document.currentScript;`,
+    `if(!s){var scripts=document.querySelectorAll('script[src*="wallproud.com/embed/"]');s=scripts[scripts.length-1];}`,
+    `if(s&&s.parentNode){s.parentNode.insertBefore(e,s)}else{document.body.appendChild(e)}`,
     `})();`,
   ].join("");
 }

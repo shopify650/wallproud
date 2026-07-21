@@ -229,24 +229,12 @@ import { addPropertyControls, ControlType } from "framer"
  */
 export default function Wallproud(props) {
     const { widgetId } = props
-    const containerRef = React.useRef(null)
-
-    React.useEffect(() => {
-        const container = containerRef.current
-        if (!container || !widgetId) return
-
-        container.innerHTML = ""
-
-        const script = document.createElement("script")
-        script.src = "${embedOrigin}/embed/" + widgetId + ".js"
-        script.async = true
-        container.appendChild(script)
-    }, [widgetId])
 
     return (
-        <div
-            ref={containerRef}
-            style={{ width: "100%", display: "block", ...props.style }}
+        <iframe
+            src={"https://wallproud.com/api/widget/" + widgetId + "/frame"}
+            style={{ width: "100%", border: "none", height: "600px", ...props.style }}
+            scrolling="no"
         />
     )
 }
