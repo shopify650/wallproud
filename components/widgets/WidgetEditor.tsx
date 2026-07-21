@@ -216,7 +216,7 @@ export default function WidgetEditor({
     router.refresh();
   };
 
-  const embedOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.com";
+  const embedOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.vercel.app";
   
   const framerCode = `// Get Started: https://www.framer.com/developers
 

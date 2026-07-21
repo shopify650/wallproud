@@ -63,7 +63,7 @@ export default function WidgetsListClient({
   };
 
   const handleCopyEmbed = async (id: string) => {
-    const code = `<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.com"}/embed/${id}.js" async></script>`;
+    const code = `<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.vercel.app"}/embed/${id}.js" async></script>`;
     await navigator.clipboard.writeText(code);
     toast.success("Embed code copied!");
   };
@@ -83,7 +83,7 @@ export default function Wallproud(props) {
 
     return (
         <iframe
-            src={"https://wallproud.com/api/widget/" + widgetId + "/frame"}
+            src={"https://wallproud.vercel.app/api/widget/" + widgetId + "/frame"}
             style={{ width: "100%", border: "none", height: "600px", ...props.style }}
             scrolling="no"
         />
