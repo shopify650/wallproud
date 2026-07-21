@@ -236,19 +236,23 @@ export default function Wallproud(props) {
         if (!widgetId) return
         fetch("${embedOrigin}/embed/" + widgetId + ".js")
             .then(res => {
-                if (!res.ok) throw new Error("Failed to load")
+                if (!res.ok) throw new Error("HTTP " + res.status)
                 return res.text()
             })
             .then(code => {
-                const match = code.match(/root\\.innerHTML='([^']+)'/)
-                if (match) {
-                    const html = match[1].replace(/\\\\n/g, "").replace(/\\\\"/g, '"').replace(/\\\\'/g, "'")
-                    setContent(html)
-                } else {
-                    setError(true)
-                }
+                const start = code.indexOf("root.innerHTML='")
+                if (start === -1) throw new Error("No root.innerHTML found")
+                const afterStart = start + "root.innerHTML='".length
+                let end = code.indexOf("';", afterStart)
+                if (end === -1) end = code.length - 1
+                let html = code.slice(afterStart, end)
+                html = html.replace(/\\\\n/g, "").replace(/\\\\"/g, '"').replace(/\\\\'/g, "'")
+                setContent(html)
             })
-            .catch(() => setError(true))
+            .catch(err => {
+                console.error("WallProud widget load error:", err)
+                setError(true)
+            })
     }, [widgetId])
 
     if (error) {
