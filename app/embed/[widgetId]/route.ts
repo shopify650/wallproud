@@ -9,7 +9,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ widgetId: string }> },
 ) {
-  const { widgetId } = await params;
+  const { widgetId: rawWidgetId } = await params;
+  const widgetId = rawWidgetId.replace(/\.js$/, "");
 
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
