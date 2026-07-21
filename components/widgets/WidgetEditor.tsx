@@ -229,10 +229,11 @@ import { addPropertyControls, ControlType } from "framer"
  */
 export default function Wallproud(props) {
     const { widgetId } = props
+    const origin = "${embedOrigin}"
 
     return (
         <iframe
-            src={"https://wallproud.com/api/widget/" + widgetId + "/frame"}
+            src={origin + "/api/widget/" + widgetId + "/frame"}
             style={{ width: "100%", border: "none", height: "600px", ...props.style }}
             scrolling="no"
         />
