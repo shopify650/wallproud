@@ -224,11 +224,11 @@ import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
 /**
- * @framerSupportedLayoutWidth auto
- * @framerSupportedLayoutHeight auto
+ * @framerSupportedLayoutWidth any
+ * @framerSupportedLayoutHeight any
  */
 export default function Wallproud(props) {
-    const { widgetId } = props
+    const { widgetId, sizeMode, customWidth, customHeight } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
 
@@ -267,10 +267,22 @@ export default function Wallproud(props) {
         return <p style={{ color: "#999", padding: 24 }}>Loading widget...</p>
     }
 
+    var containerStyle = { width: "100%", ...props.style }
+
+    if (sizeMode === "fill") {
+        containerStyle = { ...containerStyle, width: "100%", height: "100%" }
+    } else if (sizeMode === "fit") {
+        containerStyle = { ...containerStyle, width: "auto", height: "auto" }
+    } else if (sizeMode === "fixed") {
+        containerStyle = { ...containerStyle, width: (customWidth || 800) + "px", height: (customHeight || 600) + "px" }
+    } else if (sizeMode === "relative") {
+        containerStyle = { ...containerStyle, width: "100%", height: "600px" }
+    }
+
     return (
         <div
             dangerouslySetInnerHTML={{ __html: content }}
-            style={{ width: "100%", ...props.style }}
+            style={containerStyle}
         />
     )
 }
@@ -280,6 +292,25 @@ addPropertyControls(Wallproud, {
         title: "Widget ID",
         type: ControlType.String,
         defaultValue: "${widget.id}",
+    },
+    sizeMode: {
+        title: "Size Mode",
+        type: ControlType.Enum,
+        options: ["fill", "fit", "fixed", "relative"],
+        optionTitles: ["Fill", "Fit", "Fixed", "Relative"],
+        defaultValue: "fill",
+    },
+    customWidth: {
+        title: "Width (px)",
+        type: ControlType.Number,
+        defaultValue: 800,
+        hidden: (props) => props.sizeMode !== "fixed",
+    },
+    customHeight: {
+        title: "Height (px)",
+        type: ControlType.Number,
+        defaultValue: 600,
+        hidden: (props) => props.sizeMode !== "fixed",
     },
 })`;
 
