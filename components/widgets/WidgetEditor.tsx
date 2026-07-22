@@ -228,13 +228,35 @@ import { addPropertyControls, ControlType } from "framer"
  * @framerSupportedLayoutHeight any
  */
 export default function Wallproud(props) {
-    const { widgetId } = props
+    const { widgetId, mobileWidgetId } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
+    const [isMobile, setIsMobile] = React.useState(false)
+
+    function detectMobile() {
+        if (typeof window === "undefined") return false
+        const w = window.matchMedia("(max-width: 768px)")
+        const mobile = w.matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        setIsMobile(mobile)
+        return mobile
+    }
+
+    React.useEffect(() => {
+        detectMobile()
+        if (typeof window !== "undefined") {
+            window.matchMedia("(max-width: 768px)").addEventListener("change", detectMobile)
+        }
+        return () => {
+            if (typeof window !== "undefined") {
+                window.matchMedia("(max-width: 768px)").removeEventListener("change", detectMobile)
+            }
+        }
+    }, [])
 
     React.useEffect(() => {
         if (!widgetId) return
-        fetch("${embedOrigin}/embed/" + widgetId + ".js")
+        const id = (isMobile && mobileWidgetId) ? mobileWidgetId : widgetId
+        fetch("${embedOrigin}/embed/" + id + ".js")
             .then(function(res) {
                 if (!res.ok) throw new Error("HTTP " + res.status)
                 return res.text()
@@ -260,7 +282,7 @@ export default function Wallproud(props) {
                 console.error("WallProud widget load error:", err)
                 setError(true)
             })
-    }, [widgetId])
+    }, [widgetId, isMobile, mobileWidgetId])
 
     if (error) {
         return React.createElement("p", { style: { color: "#666", padding: 24 } }, "Failed to load widget")
@@ -272,15 +294,20 @@ export default function Wallproud(props) {
 
     return React.createElement("div", {
         dangerouslySetInnerHTML: { __html: content },
-        style: { width: "100%", ...props.style }
+        style: { width: "100%", minHeight: 200, ...props.style }
     })
 }
 
 addPropertyControls(Wallproud, {
     widgetId: {
-        title: "Widget ID",
+        title: "Desktop Widget ID",
         type: ControlType.String,
         defaultValue: "${widget.id}",
+    },
+    mobileWidgetId: {
+        title: "Mobile Widget ID (optional)",
+        type: ControlType.String,
+        defaultValue: "",
     },
 })`;
 
