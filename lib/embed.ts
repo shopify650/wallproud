@@ -93,7 +93,7 @@ function renderWall(items: any[], c: WidgetConfig) {
 
 function renderSlider(items: any[], c: WidgetConfig) {
   const accent = c.styling!.accentColor!;
-  const css = baseCSS(c) + `.sw{position:relative;overflow:hidden;min-height:200px}.sl{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}.sl.a{opacity:1;position:relative;pointer-events:auto}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${accent}}`;
+  const css = baseCSS(c) + `.sw{position:relative;overflow:hidden}.sl{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}.sl.a{opacity:1;position:relative;pointer-events:auto}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${accent}}`;
   const slides = items.map((t, i) => `<div class="sl${i === 0 ? " a" : ""}" data-i="${i}">${renderCard(t, c, accent)}</div>`).join("");
   const dots = items.map((_, i) => `<button class="wb${i === 0 ? " a" : ""}" data-i="${i}"></button>`).join("");
   return `<style>${css}</style><div class="wp"><div class="sw">${slides}</div><div class="wd">${dots}</div></div>`;
@@ -116,7 +116,7 @@ function carouselJSLiteral(n: number, interval: number, autoplay: boolean) {
 }
 
 function sliderJSLiteral(n: number, interval: number, autoplay: boolean) {
-  return `var sw=root.querySelector('.sw'),wd=root.querySelector('.wd');var i=0;function g(j){var a=sw.querySelector('.a');if(a)a.classList.remove('a');sw.children[j].classList.add('a');if(wd){var b=wd.querySelector('.a');if(b)b.classList.remove('a');wd.children[j].classList.add('a')}i=j}function nx(){g((i+1)%${n})}if(wd)wd.addEventListener('click',function(e){var t=e.target;if(t.classList.contains('wb'))g(parseInt(t.dataset.i))});var it=null;function st(){it=setInterval(nx,${interval})}function sp(){if(it){clearInterval(it);it=null}}${autoplay?"st();":""}if(sw)sw.addEventListener('touchstart',function(e){sp();var x=e.touches[0].clientX;sw.addEventListener('touchend',function h(e){var d=e.changedTouches[0].clientX-x;if(Math.abs(d)>40){d>0?g((i-1+${n})%${n}):nx()}sw.removeEventListener('touchend',h);${autoplay?"st();":""}},{once:true})});`;
+  return `var sw=root.querySelector('.sw'),wd=root.querySelector('.wd');var i=0;function g(j){var a=sw.querySelector('.a');if(a){a.classList.remove('a');a.style.position='absolute'}var c=sw.children[j];c.classList.add('a');c.style.position='relative';sw.style.height=c.offsetHeight+'px';if(wd){var b=wd.querySelector('.a');if(b)b.classList.remove('a');wd.children[j].classList.add('a')}i=j}function nx(){g((i+1)%${n})}if(wd)wd.addEventListener('click',function(e){var t=e.target;if(t.classList.contains('wb'))g(parseInt(t.dataset.i))});var it=null;function st(){it=setInterval(nx,${interval})}function sp(){if(it){clearInterval(it);it=null}}${autoplay?"st();":""}if(sw)sw.addEventListener('touchstart',function(e){sp();var x=e.touches[0].clientX;sw.addEventListener('touchend',function h(e){var d=e.changedTouches[0].clientX-x;if(Math.abs(d)>40){d>0?g((i-1+${n})%${n}):nx()}sw.removeEventListener('touchend',h);${autoplay?"st();":""}},{once:true})});if(sw&&sw.children.length){g(0)}}`;
 }
 
 export function generateEmbedScript(
