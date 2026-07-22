@@ -228,7 +228,7 @@ import { addPropertyControls, ControlType } from "framer"
  * @framerSupportedLayoutHeight any
  */
 export default function Wallproud(props) {
-    const { widgetId, sizeMode, customWidth, customHeight, columns, align } = props
+    const { widgetId, sizeMode, customWidth, customHeight } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
 
@@ -279,18 +279,9 @@ export default function Wallproud(props) {
         containerStyle = { ...containerStyle, width: "100%", height: "600px" }
     }
 
-    var renderedContent = content
-    if (columns || align) {
-        var gridInline = [
-            columns ? "grid-template-columns: repeat(" + columns + ", 1fr)" : "",
-            align === "center" ? "justify-content: center" : align === "right" ? "justify-content: end" : align === "left" ? "justify-content: start" : ""
-        ].filter(Boolean).join("; ")
-        renderedContent = content.replace(/<div class="g"/g, '<div class="g" style="' + gridInline + '"')
-    }
-
     return (
         <div style={containerStyle}>
-            <div dangerouslySetInnerHTML={{ __html: renderedContent }} />
+            <div dangerouslySetInnerHTML={{ __html: content }} />
         </div>
     )
 }
@@ -319,21 +310,6 @@ addPropertyControls(Wallproud, {
         type: ControlType.Number,
         defaultValue: 600,
         hidden: (props) => props.sizeMode !== "fixed",
-    },
-    columns: {
-        title: "Columns",
-        type: ControlType.Number,
-        defaultValue: 3,
-        min: 1,
-        max: 4,
-        step: 1,
-    },
-    align: {
-        title: "Align",
-        type: ControlType.Enum,
-        options: ["left", "center", "right"],
-        optionTitles: ["Left", "Center", "Right"],
-        defaultValue: "left",
     },
 })`;
 
