@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Plus, X, Star } from "lucide-react";
+import { ArrowLeft, Plus, X, Star, Upload } from "lucide-react";
 import toast from "react-hot-toast";
-import { createTestimonial } from "@/app/actions/testimonials";
+import { createTestimonial, uploadAuthorImage } from "@/app/actions/testimonials";
 
 export default function AddTestimonialPage() {
   const router = useRouter();
@@ -21,6 +21,9 @@ export default function AddTestimonialPage() {
   });
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [authorImage, setAuthorImage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addTag = () => {
     const t = tagInput.trim();
@@ -32,6 +35,31 @@ export default function AddTestimonialPage() {
 
   const removeTag = (tag: string) => {
     setTags(tags.filter((t) => t !== tag));
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+
+    setLoading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await uploadAuthorImage(fd);
+    setLoading(false);
+
+    if (res.error) {
+      toast.error(res.error);
+      setImagePreview(null);
+      return;
+    }
+
+    setAuthorImage(res.url || "");
+    if (res.url) {
+      setImagePreview(res.url);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +77,7 @@ export default function AddTestimonialPage() {
     const res = await createTestimonial(wsData.id, {
       author_name: formData.author_name,
       author_email: formData.author_email,
+      author_image: authorImage || undefined,
       author_company: formData.author_company,
       author_role: formData.author_role,
       content: formData.content,
@@ -96,6 +125,45 @@ export default function AddTestimonialPage() {
                 placeholder="Jane Doe"
                 className="input-field mt-1"
               />
+            </div>
+            <div>
+              <label className="font-body-sm block text-ink">Author Image</label>
+              <div className="mt-1 flex items-center gap-3">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="h-10 w-10 rounded-full object-cover" />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-surface-2 flex items-center justify-center">
+                    <Upload className="h-4 w-4 text-muted" />
+                  </div>
+                )}
+                <div>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    ref={fileInputRef}
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="btn-secondary text-xs"
+                    disabled={loading}
+                  >
+                    {imagePreview ? "Change Image" : "Upload Image"}
+                  </button>
+                  {imagePreview && authorImage && (
+                    <button
+                      type="button"
+                      onClick={() => { setImagePreview(null); setAuthorImage(""); }}
+                      className="ml-2 text-xs text-muted hover:text-ink"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="mt-1 font-caption text-xs text-muted">PNG, JPG or WebP. Max 2MB.</p>
             </div>
             <div>
               <label className="font-body-sm block text-ink">Email</label>

@@ -80,8 +80,12 @@ export default memo(function TestimonialCard({
         selected ? "border-accent bg-surface-2" : "border-hairline bg-surface-1 hover:bg-surface-2"
       }`}>
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-2 font-body-sm font-bold text-accent">
-            {testimonial.author_name.charAt(0).toUpperCase()}
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-2 overflow-hidden">
+            {testimonial.author_image ? (
+              <img src={testimonial.author_image} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="font-body-sm font-bold text-accent">{testimonial.author_name.charAt(0).toUpperCase()}</span>
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">

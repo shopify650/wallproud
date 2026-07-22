@@ -3,11 +3,12 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getPlanLimits } from "@/lib/auth-utils";
+import { getPlanLimits, getCurrentWorkspace } from "@/lib/auth-utils";
 
 const testimonialSchema = z.object({
   author_name: z.string().min(1).max(100),
   author_email: z.string().email().max(255).optional().or(z.literal("")),
+  author_image: z.string().url().optional().or(z.literal("")),
   author_company: z.string().max(100).optional().or(z.literal("")),
   author_role: z.string().max(100).optional().or(z.literal("")),
   content: z.string().min(1).max(5000),
@@ -20,6 +21,7 @@ const testimonialSchema = z.object({
 const updateSchema = z.object({
   author_name: z.string().min(1).max(100).optional(),
   author_email: z.string().email().max(255).optional().nullable().or(z.literal("")),
+  author_image: z.string().url().optional().nullable().or(z.literal("")),
   author_company: z.string().max(100).optional().nullable().or(z.literal("")),
   author_role: z.string().max(100).optional().nullable().or(z.literal("")),
   content: z.string().min(1).max(5000).optional(),
@@ -45,6 +47,58 @@ async function getWorkspaceAndUser(supabase: SupabaseClient) {
     .single();
 
   return { userId: user.id, plan: (profile?.plan as string) || "free" };
+}
+
+export async function uploadAuthorImage(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string; url?: string }> {
+  const raw = formData.get("file");
+  if (!(raw instanceof File)) {
+    return { success: false, error: "Missing file" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) return { success: false, error: "Workspace not found" };
+
+  const maxBytes = 2 * 1024 * 1024;
+  if (raw.size === 0 || raw.size > maxBytes) {
+    return { success: false, error: "Image must be between 1 byte and 2 MB" };
+  }
+
+  const contentType = (raw.type || "image/png").split(";")[0];
+  const allowed = ["image/png", "image/jpeg", "image/webp"];
+  if (!allowed.includes(contentType)) {
+    return { success: false, error: "Only PNG, JPG, or WebP images are allowed" };
+  }
+
+  const ext = contentType.split("/")[1] || "png";
+  const fileName = `${workspace.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const buffer = Buffer.from(await raw.arrayBuffer());
+
+  const { error: uploadError } = await supabase.storage
+    .from("testimonial-images")
+    .upload(fileName, buffer, {
+      contentType,
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
+  }
+
+  const { data: urlData } = supabase.storage
+    .from("testimonial-images")
+    .getPublicUrl(fileName);
+
+  return { success: true, url: urlData.publicUrl };
 }
 
 export async function createTestimonial(
@@ -82,6 +136,7 @@ export async function createTestimonial(
     workspace_id: workspaceId,
     author_name: parsed.data.author_name,
     author_email: parsed.data.author_email || null,
+    author_image: parsed.data.author_image || null,
     author_company: parsed.data.author_company || null,
     author_role: parsed.data.author_role || null,
     content: parsed.data.content,
@@ -116,7 +171,7 @@ export async function updateTestimonial(
 
   const updateData: Record<string, unknown> = {};
   const fields: (keyof typeof parsed.data)[] = [
-    "author_name", "author_email", "author_company", "author_role",
+    "author_name", "author_email", "author_image", "author_company", "author_role",
     "content", "rating", "source", "tags", "status",
   ];
 

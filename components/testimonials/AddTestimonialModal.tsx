@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Plus, Star } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, Plus, Star, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   createTestimonial,
   updateTestimonial,
+  uploadAuthorImage,
 } from "@/app/actions/testimonials";
 
 type AddTestimonialModalProps = {
@@ -18,6 +19,7 @@ type AddTestimonialModalProps = {
 const defaultForm = {
   author_name: "",
   author_email: "",
+  author_image: "",
   author_company: "",
   author_role: "",
   content: "",
@@ -36,6 +38,8 @@ export default function AddTestimonialModal({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(defaultForm);
   const [tagInput, setTagInput] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -44,6 +48,7 @@ export default function AddTestimonialModal({
           ? {
               author_name: editTestimonial.author_name || "",
               author_email: editTestimonial.author_email || "",
+              author_image: editTestimonial.author_image || "",
               author_company: editTestimonial.author_company || "",
               author_role: editTestimonial.author_role || "",
               content: editTestimonial.content || "",
@@ -55,6 +60,7 @@ export default function AddTestimonialModal({
           : defaultForm,
       );
       setTagInput("");
+      setImagePreview(editTestimonial?.author_image || null);
     }
   }, [editTestimonial, open]);
 
@@ -73,6 +79,31 @@ export default function AddTestimonialModal({
     });
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+
+    setLoading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await uploadAuthorImage(fd);
+    setLoading(false);
+
+    if (res.error) {
+      toast.error(res.error);
+      setImagePreview(null);
+      return;
+    }
+
+    setFormData({ ...formData, author_image: res.url || "" });
+    if (res.url) {
+      setImagePreview(res.url);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -81,6 +112,7 @@ export default function AddTestimonialModal({
       const res = await updateTestimonial(editTestimonial.id, {
         author_name: formData.author_name,
         author_email: formData.author_email,
+        author_image: formData.author_image || undefined,
         author_company: formData.author_company,
         author_role: formData.author_role,
         content: formData.content,
@@ -140,21 +172,47 @@ export default function AddTestimonialModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="font-body-sm block text-ink">
-                Name <span className="text-accent">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.author_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, author_name: e.target.value })
-                }
-                placeholder="Jane Doe"
-                className="input-field mt-1"
-              />
+          <div>
+            <label className="font-body-sm block text-ink">
+              Author Image
+            </label>
+            <div className="mt-1 flex items-center gap-3">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="h-12 w-12 rounded-full object-cover" />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-surface-2 flex items-center justify-center">
+                  <Upload className="h-5 w-5 text-muted" />
+                </div>
+              )}
+              <div>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  ref={fileInputRef}
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="btn-secondary text-xs"
+                  disabled={loading}
+                >
+                  {imagePreview ? "Change Image" : "Upload Image"}
+                </button>
+                {imagePreview && formData.author_image && (
+                  <button
+                    type="button"
+                    onClick={() => { setImagePreview(null); setFormData({ ...formData, author_image: "" }); }}
+                    className="ml-2 text-xs text-muted hover:text-ink"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
+            <p className="mt-1 font-caption text-xs text-muted">PNG, JPG or WebP. Max 2MB.</p>
+          </div>
             <div>
               <label className="font-body-sm block text-ink">
                 Email
