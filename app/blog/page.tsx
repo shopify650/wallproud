@@ -1,41 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
-
-const posts = [
-  {
-    title: "How to collect testimonials that actually convert",
-    excerpt: "Not all testimonials are created equal. Learn the framework for asking customers the right questions to get powerful, conversion-driving social proof.",
-    date: "July 12, 2026",
-    author: "Alex Rivera",
-    category: "Guides",
-    slug: "how-to-collect-testimonials",
-  },
-  {
-    title: "Why video testimonials are the future of SaaS marketing",
-    excerpt: "Text reviews are great, but video builds authentic trust. See how adding just 3 video testimonials to your landing page can boost conversions by 30%.",
-    date: "June 24, 2026",
-    author: "Sarah Chen",
-    category: "Marketing",
-    slug: "video-testimonials-future",
-  },
-  {
-    title: "Social proof best practices for 2026",
-    excerpt: "From Shadow DOM isolation to AI tagging, discover the modern technical and psychological strategies for leveraging customer love.",
-    date: "June 5, 2026",
-    author: "Alex Rivera",
-    category: "Strategy",
-    slug: "social-proof-best-practices",
-  },
-  {
-    title: "How we built WallProud to be the fastest widget on the web",
-    excerpt: "A deep dive into our architecture, edge caching, and why we chose Shadow DOM to guarantee zero style conflicts and sub-100ms load times.",
-    date: "May 18, 2026",
-    author: "James Wilson",
-    category: "Engineering",
-    slug: "building-fastest-widget",
-  },
-];
+import { posts } from "@/lib/blog-posts";
 
 export default function BlogPage() {
   return (
