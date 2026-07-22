@@ -222,18 +222,10 @@ export default function WidgetEditor({
 import { addPropertyControls, ControlType } from "framer"
 
 function Wallproud(props) {
-    var ref = React.useRef(null)
     var widgetId = props.widgetId || ""
-    var embedUrl = "${embedOrigin}/api/widget/" + widgetId + "/html"
-
-    React.useEffect(function() {
-        var el = ref.current
-        if (!el || !widgetId) return
-        el.src = embedUrl
-    }, [widgetId])
+    var embedUrl = widgetId ? "${embedOrigin}/api/widget/" + widgetId + "/html" : "about:blank"
 
     return React.createElement("iframe", {
-        ref: ref,
         src: embedUrl,
         style: { width: "100%", height: "600px", border: "none", display: "block" },
         scrolling: "no"
@@ -246,7 +238,9 @@ addPropertyControls(Wallproud, {
         type: ControlType.String,
         defaultValue: "${widget.id}",
     },
-})`;
+})
+
+export default Wallproud`;
 
   const embedCode =
     embedTab === "iframe"
