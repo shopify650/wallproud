@@ -228,7 +228,7 @@ import { addPropertyControls, ControlType } from "framer"
  * @framerSupportedLayoutHeight any
  */
 export default function Wallproud(props) {
-    const { widgetId, sizeMode, customWidth, customHeight } = props
+    const { widgetId, sizeMode, customWidth, customHeight, columns, align } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
 
@@ -279,11 +279,18 @@ export default function Wallproud(props) {
         containerStyle = { ...containerStyle, width: "100%", height: "600px" }
     }
 
+    var id = "wp-framer-" + widgetId
+    var overrideStyle = ""
+    if (columns) overrideStyle += "#" + id + " .g { grid-template-columns: repeat(" + columns + ", 1fr) !important; }"
+    if (align === "center") overrideStyle += "#" + id + " .g { justify-content: center !important; }"
+    else if (align === "right") overrideStyle += "#" + id + " .g { justify-content: end !important; }"
+    else if (align === "left") overrideStyle += "#" + id + " .g { justify-content: start !important; }"
+
     return (
-        <div
-            dangerouslySetInnerHTML={{ __html: content }}
-            style={containerStyle}
-        />
+        <div id={id} style={containerStyle}>
+            {overrideStyle ? <style>{overrideStyle}</style> : null}
+            <div dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
     )
 }
 
@@ -311,6 +318,21 @@ addPropertyControls(Wallproud, {
         type: ControlType.Number,
         defaultValue: 600,
         hidden: (props) => props.sizeMode !== "fixed",
+    },
+    columns: {
+        title: "Columns",
+        type: ControlType.Number,
+        defaultValue: 3,
+        min: 1,
+        max: 4,
+        step: 1,
+    },
+    align: {
+        title: "Align",
+        type: ControlType.Enum,
+        options: ["left", "center", "right"],
+        optionTitles: ["Left", "Center", "Right"],
+        defaultValue: "left",
     },
 })`;
 
