@@ -218,18 +218,25 @@ export default function WidgetEditor({
 
   const embedOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.vercel.app";
   
-  const framerCode = `import * as React from "react"
+  const framerCode = `// Get Started: https://www.framer.com/developers
+
 import { addPropertyControls, ControlType } from "framer"
 
-function Wallproud(props) {
-    var widgetId = props.widgetId || ""
-    var embedUrl = widgetId ? "${embedOrigin}/api/widget/" + widgetId + "/html" : "about:blank"
+/**
+ * @framerSupportedLayoutWidth auto
+ * @framerSupportedLayoutHeight auto
+ */
+export default function Wallproud(props) {
+    const { widgetId } = props
+    const embedUrl = widgetId ? "${embedOrigin}/api/widget/" + widgetId + "/html" : "about:blank"
 
-    return React.createElement("iframe", {
-        src: embedUrl,
-        style: { width: "100%", height: "600px", border: "none", display: "block" },
-        scrolling: "no"
-    })
+    return (
+        <iframe
+            src={embedUrl}
+            style={{ width: "100%", height: "600px", border: "none", display: "block" }}
+            scrolling="no"
+        />
+    )
 }
 
 addPropertyControls(Wallproud, {
@@ -238,9 +245,7 @@ addPropertyControls(Wallproud, {
         type: ControlType.String,
         defaultValue: "${widget.id}",
     },
-})
-
-export default Wallproud`;
+})`;
 
   const embedCode =
     embedTab === "iframe"
