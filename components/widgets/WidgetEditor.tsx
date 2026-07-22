@@ -220,6 +220,7 @@ export default function WidgetEditor({
   
   const framerCode = `// Get Started: https://www.framer.com/developers
 
+import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
 /**
@@ -228,13 +229,48 @@ import { addPropertyControls, ControlType } from "framer"
  */
 export default function Wallproud(props) {
     const { widgetId } = props
-    const embedUrl = widgetId ? "${embedOrigin}/api/widget/" + widgetId + "/html" : "about:blank"
+    const [content, setContent] = React.useState("")
+    const [error, setError] = React.useState(false)
+
+    React.useEffect(() => {
+        if (!widgetId) return
+        fetch("${embedOrigin}/embed/" + widgetId + ".js")
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to load")
+                return res.text()
+            })
+            .then(code => {
+                var marker = "root.innerHTML='"
+                var start = code.indexOf(marker)
+                if (start === -1) {
+                    console.error("WallProud: marker not found")
+                    setError(true)
+                    return
+                }
+                var afterStart = start + marker.length
+                var end = code.indexOf("';", afterStart)
+                if (end === -1) end = code.indexOf("';", afterStart + 1)
+                var html = code.slice(afterStart, end)
+                html = html.split("\\\\n").join("")
+                html = html.split('\\\\"').join('"')
+                html = html.split("\\\\'").join("'")
+                setContent(html)
+            })
+            .catch(() => setError(true))
+    }, [widgetId])
+
+    if (error) {
+        return <p style={{ color: "#666", padding: 24 }}>Failed to load widget</p>
+    }
+
+    if (!content) {
+        return <p style={{ color: "#999", padding: 24 }}>Loading widget...</p>
+    }
 
     return (
-        <iframe
-            src={embedUrl}
-            style={{ width: "100%", height: "600px", border: "none", display: "block" }}
-            scrolling="no"
+        <div
+            dangerouslySetInnerHTML={{ __html: content }}
+            style={{ width: "100%", ...props.style }}
         />
     )
 }
@@ -249,7 +285,7 @@ addPropertyControls(Wallproud, {
 
   const embedCode =
     embedTab === "iframe"
-      ? `<iframe src="${embedOrigin}/api/widget/${widget.id}/html" width="100%" height="600" frameborder="0" loading="lazy" title="WallProud Testimonials"></iframe>`
+      ? `<iframe src="${embedOrigin}/embed/${widget.id}" width="100%" height="600" frameborder="0" loading="lazy" title="WallProud Testimonials"></iframe>`
       : embedTab === "framer"
       ? framerCode
       : `<script src="${embedOrigin}/embed/${widget.id}.js" async></script>`;
