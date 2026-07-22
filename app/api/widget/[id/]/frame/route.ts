@@ -51,7 +51,7 @@ export async function GET(
   if (!testimonials || testimonials.length === 0) {
     return new Response(
       `<html><body style="font-family:system-ui;padding:24px;color:#666"><p>No testimonials to display</p></body></html>`,
-      { status: 404, headers: { "Content-Type": "text/html" } }
+      { status: 200, headers: { "Content-Type": "text/html" } }
     );
   }
 
@@ -63,7 +63,7 @@ export async function GET(
   if (!script) {
     return new Response(
       `<html><body style="font-family:system-ui;padding:24px;color:#666"><p>No approved testimonials</p></body></html>`,
-      { status: 404, headers: { "Content-Type": "text/html" } }
+      { status: 200, headers: { "Content-Type": "text/html" } }
     );
   }
 
