@@ -63,7 +63,9 @@ function baseCSS(c: WidgetConfig) {
 
 function renderGrid(items: any[], c: WidgetConfig) {
   const accent = c.styling!.accentColor!;
-  const css = baseCSS(c);
+  const col = Math.min(c.layout?.columns || 2, 4);
+  const gap = c.layout?.gap || 20;
+  const css = baseCSS(c) + `.g{display:grid;grid-template-columns:repeat(${col},1fr);gap:${gap}px}`;
   return `<style>${css}</style><div class="wp"><div class="g">${items.map((t) => renderCard(t, c, accent)).join("")}</div></div>`;
 }
 
