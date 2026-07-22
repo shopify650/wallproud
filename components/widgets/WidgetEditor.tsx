@@ -279,17 +279,18 @@ export default function Wallproud(props) {
         containerStyle = { ...containerStyle, width: "100%", height: "600px" }
     }
 
-    var id = "wp-framer-" + widgetId
-    var overrideStyle = ""
-    if (columns) overrideStyle += "#" + id + " .g { grid-template-columns: repeat(" + columns + ", 1fr) !important; }"
-    if (align === "center") overrideStyle += "#" + id + " .g { justify-content: center !important; }"
-    else if (align === "right") overrideStyle += "#" + id + " .g { justify-content: end !important; }"
-    else if (align === "left") overrideStyle += "#" + id + " .g { justify-content: start !important; }"
+    var renderedContent = content
+    if (columns || align) {
+        var gridInline = [
+            columns ? "grid-template-columns: repeat(" + columns + ", 1fr)" : "",
+            align === "center" ? "justify-content: center" : align === "right" ? "justify-content: end" : align === "left" ? "justify-content: start" : ""
+        ].filter(Boolean).join("; ")
+        renderedContent = content.replace(/<div class="g"/g, '<div class="g" style="' + gridInline + '"')
+    }
 
     return (
-        <div id={id} style={containerStyle}>
-            {overrideStyle ? <style>{overrideStyle}</style> : null}
-            <div dangerouslySetInnerHTML={{ __html: content }} />
+        <div style={containerStyle}>
+            <div dangerouslySetInnerHTML={{ __html: renderedContent }} />
         </div>
     )
 }
