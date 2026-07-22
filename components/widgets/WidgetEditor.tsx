@@ -218,73 +218,26 @@ export default function WidgetEditor({
 
   const embedOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://wallproud.vercel.app";
   
-  const framerCode = `// Get Started: https://www.framer.com/developers
-
-import * as React from "react"
+  const framerCode = `import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-function Wallproud(props) {
-    const { widgetId } = props
-    const [content, setContent] = React.useState("")
-    const [error, setError] = React.useState(false)
-
-    React.useEffect(function() {
-        if (!widgetId) return
-        fetch("${embedOrigin}/embed/" + widgetId + ".js")
-            .then(function(res) {
-                if (!res.ok) throw new Error("HTTP " + res.status)
-                return res.text()
-            })
-            .then(function(code) {
-                var marker = "root.innerHTML='"
-                var start = code.indexOf(marker)
-                if (start === -1) {
-                    console.error("WallProud: marker not found")
-                    setError(true)
-                    return
-                }
-                var afterStart = start + marker.length
-                var end = code.indexOf("';", afterStart)
-                if (end === -1) end = code.indexOf("';", afterStart + 1)
-                var html = code.slice(afterStart, end)
-                html = html.split("\\\\n").join("")
-                html = html.split('\\\\"').join('"')
-                html = html.split("\\\\'").join("'")
-                setContent(html)
-            })
-            .catch(function(err) {
-                console.error("WallProud widget load error:", err)
-                setError(true)
-            })
-    }, [widgetId])
-
-    if (error) {
-        return React.createElement("p", { style: { color: "#666", padding: 24 } }, "Failed to load widget")
-    }
-
-    if (!content) {
-        return React.createElement("p", { style: { color: "#999", padding: 24 } }, "Loading widget...")
-    }
-
-    return React.createElement("div", {
-        dangerouslySetInnerHTML: { __html: content },
-        style: { width: "100%", minHeight: 200, ...props.style }
+var Wallproud = function(props) {
+    return React.createElement("iframe", {
+        src: "${embedOrigin}/embed/${widget.id}",
+        style: { width: "100%", height: "600px", border: "none", display: "block" },
+        scrolling: "no"
     })
 }
 
-export default Wallproud
-
 addPropertyControls(Wallproud, {
-    widgetId: {
-        title: "Widget ID",
-        type: ControlType.String,
-        defaultValue: "${widget.id}",
-    },
-})`;
+    widgetId: { title: "Widget ID", type: ControlType.String, defaultValue: "${widget.id}" }
+})
+
+export default Wallproud`;
 
   const embedCode =
     embedTab === "iframe"
-      ? `<iframe src="${embedOrigin}/embed/${widget.id}" width="100%" height="600" frameborder="0" loading="lazy" title="WallProud Testimonials"></iframe>`
+      ? `<iframe src="${embedOrigin}/api/widget/${widget.id}/html" width="100%" height="600" frameborder="0" loading="lazy" title="WallProud Testimonials"></iframe>`
       : embedTab === "framer"
       ? framerCode
       : `<script src="${embedOrigin}/embed/${widget.id}.js" async></script>`;
