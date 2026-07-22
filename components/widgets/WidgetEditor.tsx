@@ -223,16 +223,12 @@ export default function WidgetEditor({
 import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-/**
- * @framerSupportedLayoutWidth any
- * @framerSupportedLayoutHeight any
- */
-export default function Wallproud(props) {
+function Wallproud(props) {
     const { widgetId } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
 
-    React.useEffect(() => {
+    React.useEffect(function() {
         if (!widgetId) return
         fetch("${embedOrigin}/embed/" + widgetId + ".js")
             .then(function(res) {
@@ -275,6 +271,8 @@ export default function Wallproud(props) {
         style: { width: "100%", minHeight: 200, ...props.style }
     })
 }
+
+export default Wallproud
 
 addPropertyControls(Wallproud, {
     widgetId: {
