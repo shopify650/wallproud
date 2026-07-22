@@ -30,6 +30,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
+      {/*WallProud blog post page */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute top-[-15%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#d44df0]/[0.03] blur-[120px]" />
       </div>
