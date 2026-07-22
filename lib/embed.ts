@@ -54,7 +54,7 @@ function baseCSS(c: WidgetConfig) {
     `.n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
     `.m{font-size:12px;opacity:.6}`,
     `.d{font-size:11px;opacity:.5;margin-left:auto;white-space:nowrap}`,
-    `.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:${c.layout?.gap || 20}px}`,
+    `.g{display:grid;gap:${c.layout?.gap || 20}px}`,
     `.w{columns:${Math.min(c.layout?.columns || 3, 4)};column-gap:${c.layout?.gap || 20}px}.w>.c{margin-bottom:${c.layout?.gap || 20}px;display:inline-block;width:100%}`,
     `.sw{position:relative;overflow:hidden;min-height:200px}.sl{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}.sl.a{opacity:1;position:relative;pointer-events:auto}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${s.accentColor || "#000000"}}`,
     `.cw{position:relative;overflow:hidden}.ci{display:flex;transition:transform .5s ease}.cs{min-width:100%;padding:0 4px;box-sizing:border-box}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${s.accentColor || "#000000"}}`,
