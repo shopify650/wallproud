@@ -45,7 +45,7 @@ function baseCSS(c: WidgetConfig) {
   const s = c.styling!;
   const maxWidth = c.layout?.maxWidth || 1000;
   return [
-    `@media (max-width: 640px) { .wp { padding: 16px 12px; } }`,
+    `@media (max-width: 640px) { .wp { padding: 16px 12px; } .g { grid-template-columns: 1fr !important; } .w { columns: 1 !important; } }`,
     `.wp{font-family:${s.fontFamily || "system-ui,sans-serif"};background:${s.backgroundColor};color:${s.textColor};max-width:${maxWidth}px;margin:0 auto;padding:24px 16px;box-sizing:border-box;width:100%}`,
     `.c{color:${s.textColor};box-shadow:0 1px 4px rgba(0,0,0,.08);break-inside:avoid;box-sizing:border-box}`,
     `.t{font-size:15px;line-height:1.6;word-wrap:break-word}`,
@@ -58,15 +58,12 @@ function baseCSS(c: WidgetConfig) {
     `.w{columns:${Math.min(c.layout?.columns || 3, 4)};column-gap:${c.layout?.gap || 20}px}.w>.c{margin-bottom:${c.layout?.gap || 20}px;display:inline-block;width:100%}`,
     `.sw{position:relative;overflow:hidden;min-height:200px}.sl{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}.sl.a{opacity:1;position:relative;pointer-events:auto}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${s.accentColor || "#000000"}}`,
     `.cw{position:relative;overflow:hidden}.ci{display:flex;transition:transform .5s ease}.cs{min-width:100%;padding:0 4px;box-sizing:border-box}.wd{display:flex;justify-content:center;gap:8px;margin-top:16px}.wb{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:#d1d5db;transition:background .3s}.wb.a{background:${s.accentColor || "#000000"}}`,
-    `@media (max-width: 640px) { .g { grid-template-columns: 1fr; } }`,
   ].join("");
 }
 
 function renderGrid(items: any[], c: WidgetConfig) {
-  const col = Math.min(c.layout?.columns || 2, 4);
-  const gap = c.layout?.gap || 20;
   const accent = c.styling!.accentColor!;
-  const css = baseCSS(c) + `.g{display:grid;grid-template-columns:repeat(${col},1fr);gap:${gap}px}`;
+  const css = baseCSS(c);
   return `<style>${css}</style><div class="wp"><div class="g">${items.map((t) => renderCard(t, c, accent)).join("")}</div></div>`;
 }
 

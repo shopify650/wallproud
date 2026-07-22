@@ -228,35 +228,13 @@ import { addPropertyControls, ControlType } from "framer"
  * @framerSupportedLayoutHeight any
  */
 export default function Wallproud(props) {
-    const { widgetId, mobileWidgetId } = props
+    const { widgetId } = props
     const [content, setContent] = React.useState("")
     const [error, setError] = React.useState(false)
-    const [isMobile, setIsMobile] = React.useState(false)
-
-    function detectMobile() {
-        if (typeof window === "undefined") return false
-        const w = window.matchMedia("(max-width: 768px)")
-        const mobile = w.matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-        setIsMobile(mobile)
-        return mobile
-    }
-
-    React.useEffect(() => {
-        detectMobile()
-        if (typeof window !== "undefined") {
-            window.matchMedia("(max-width: 768px)").addEventListener("change", detectMobile)
-        }
-        return () => {
-            if (typeof window !== "undefined") {
-                window.matchMedia("(max-width: 768px)").removeEventListener("change", detectMobile)
-            }
-        }
-    }, [])
 
     React.useEffect(() => {
         if (!widgetId) return
-        const id = (isMobile && mobileWidgetId) ? mobileWidgetId : widgetId
-        fetch("${embedOrigin}/embed/" + id + ".js")
+        fetch("${embedOrigin}/embed/" + widgetId + ".js")
             .then(function(res) {
                 if (!res.ok) throw new Error("HTTP " + res.status)
                 return res.text()
@@ -282,7 +260,7 @@ export default function Wallproud(props) {
                 console.error("WallProud widget load error:", err)
                 setError(true)
             })
-    }, [widgetId, isMobile, mobileWidgetId])
+    }, [widgetId])
 
     if (error) {
         return React.createElement("p", { style: { color: "#666", padding: 24 } }, "Failed to load widget")
@@ -300,14 +278,9 @@ export default function Wallproud(props) {
 
 addPropertyControls(Wallproud, {
     widgetId: {
-        title: "Desktop Widget ID",
+        title: "Widget ID",
         type: ControlType.String,
         defaultValue: "${widget.id}",
-    },
-    mobileWidgetId: {
-        title: "Mobile Widget ID (optional)",
-        type: ControlType.String,
-        defaultValue: "",
     },
 })`;
 
