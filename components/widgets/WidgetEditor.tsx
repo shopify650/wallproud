@@ -221,19 +221,32 @@ export default function WidgetEditor({
   const framerCode = `import * as React from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-var Wallproud = function(props) {
+function Wallproud(props) {
+    var ref = React.useRef(null)
+    var widgetId = props.widgetId || ""
+    var embedUrl = "${embedOrigin}/api/widget/" + widgetId + "/html"
+
+    React.useEffect(function() {
+        var el = ref.current
+        if (!el || !widgetId) return
+        el.src = embedUrl
+    }, [widgetId])
+
     return React.createElement("iframe", {
-        src: "${embedOrigin}/embed/${widget.id}",
+        ref: ref,
+        src: embedUrl,
         style: { width: "100%", height: "600px", border: "none", display: "block" },
         scrolling: "no"
     })
 }
 
 addPropertyControls(Wallproud, {
-    widgetId: { title: "Widget ID", type: ControlType.String, defaultValue: "${widget.id}" }
-})
-
-export default Wallproud`;
+    widgetId: {
+        title: "Widget ID",
+        type: ControlType.String,
+        defaultValue: "${widget.id}",
+    },
+})`;
 
   const embedCode =
     embedTab === "iframe"
