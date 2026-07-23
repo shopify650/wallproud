@@ -10,7 +10,7 @@ async function createFavicon() {
   const pngBuffers = [];
 
   for (const size of sizes) {
-    const rgbaPng = await sharp(path.join(publicDir, "logo.gif"))
+    const rgbaPng = await sharp(path.join(publicDir, "logo.webp"))
       .resize(size, size, { fit: "contain", background: { r: 9, g: 9, b: 9, alpha: 0 } })
       .ensureAlpha()
       .png()

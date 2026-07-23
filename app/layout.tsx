@@ -16,9 +16,11 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "64x64 128x128 192x192 256x256", type: "image/x-icon" },
       { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
       { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/logo.webp", sizes: "any", type: "image/webp" },
     ],
     apple: [
       { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/logo.webp", sizes: "any", type: "image/webp" },
     ],
   },
 };
