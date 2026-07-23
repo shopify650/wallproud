@@ -141,7 +141,7 @@ sh.innerHTML='<style>'
 +'.wp-form{padding:16px 18px 18px !important;gap:12px !important}'
 +'.wp-ft{padding:12px 18px !important}'
 +'.wp-stars svg{width:28px !important;height:28px !important}'
-+(w.display_type === 'floating' ? '#tb{bottom:16px !important;'+(w.position === 'bottom-left' ? 'left:16px !important;' : w.position === 'bottom-center' ? 'left:50% !important;transform:translateX(-50%) !important;' : 'right:16px !important;')+'}' : '')
+${w.display_type === 'floating' ? '#tb{bottom:16px !important;'+(w.position === 'bottom-left' ? 'left:16px !important;' : w.position === 'bottom-center' ? 'left:50% !important;transform:translateX(-50%) !important;' : 'right:16px !important;')+'}' : ''}
 +'}'
 +'</style>'
 +'<div class="wp-panel" id="pn">'
