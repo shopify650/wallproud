@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 const submitSchema = z.object({
   author_name: z.string().min(1).max(100),
   author_email: z.string().email().max(255).optional().or(z.literal("")),
+  author_image: z.string().url().optional().or(z.literal("")),
   author_company: z.string().max(100).optional().or(z.literal("")),
   author_role: z.string().max(100).optional().or(z.literal("")),
   content: z.string().min(1).max(5000),
@@ -110,6 +111,7 @@ export async function submitTestimonial(
     workspace_id: request.workspace_id,
     author_name: parsed.data.author_name,
     author_email: parsed.data.author_email || null,
+    author_image: parsed.data.author_image || null,
     author_company: parsed.data.author_company || null,
     author_role: parsed.data.author_role || null,
     content: parsed.data.content,

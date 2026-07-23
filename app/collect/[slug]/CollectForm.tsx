@@ -16,6 +16,7 @@ type FieldConfig = {
   show_role: boolean;
   role_required: boolean;
   show_video: boolean;
+  show_image: boolean;
   min_characters: number;
   max_characters: number;
 };
@@ -153,6 +154,7 @@ export default function CollectForm({
     show_role: false,
     role_required: false,
     show_video: false,
+    show_image: false,
     min_characters: 10,
     max_characters: 5000,
   };
@@ -164,9 +166,11 @@ export default function CollectForm({
   const [done, setDone] = useState(false);
   const [recording, setRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const mediaRecRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     rating: null as number | null,
@@ -175,6 +179,7 @@ export default function CollectForm({
     author_company: "",
     author_role: "",
     author_email: "",
+    author_image: "" as string,
     video_url: null as string | null,
   });
 
@@ -216,6 +221,30 @@ export default function CollectForm({
     }
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+    setImagePreview(preview);
+
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload/image", {
+      method: "POST",
+      body: fd,
+    });
+
+    if (!res.ok) {
+      toast.error("Failed to upload image");
+      setImagePreview(null);
+      return;
+    }
+
+    const data = await res.json();
+    setForm((prev) => ({ ...prev, author_image: data.url }));
+  };
+
   const stopRecording = () => {
     mediaRecRef.current?.stop();
     setRecording(false);
@@ -254,6 +283,7 @@ export default function CollectForm({
       const res = await submitTestimonial(token, {
         author_name: form.author_name,
         author_email: form.author_email,
+        author_image: form.author_image || undefined,
         author_company: form.author_company,
         author_role: form.author_role,
         content: form.content,
@@ -352,6 +382,47 @@ export default function CollectForm({
               className="block w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2"
               style={{ outlineColor: brandColor }}
             />
+            {fieldConfig.show_image && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Your photo
+                </label>
+                <div className="mt-1 flex items-center gap-3">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="h-12 w-12 rounded-full object-cover" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                      <Camera className="h-5 w-5 text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      ref={fileInputRef}
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-sm text-gray-600 underline hover:text-gray-900"
+                    >
+                      {imagePreview ? "Change photo" : "Upload a photo"}
+                    </button>
+                    {imagePreview && (
+                      <button
+                        type="button"
+                        onClick={() => { setImagePreview(null); setForm((prev) => ({ ...prev, author_image: "" })); }}
+                        className="ml-2 text-sm text-gray-400 underline hover:text-gray-600"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             {fieldConfig.show_name && (
               <div>
                 <label className="block text-sm font-medium text-gray-700">

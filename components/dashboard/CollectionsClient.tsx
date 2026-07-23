@@ -47,6 +47,7 @@ const defaultFieldConfig = {
   show_role: false,
   role_required: false,
   show_video: false,
+  show_image: false,
   min_characters: 10,
   max_characters: 5000,
 };
@@ -274,6 +275,7 @@ function EditModal({ collection, onClose, onSave, plan }: {
                 { key: "show_company", label: "Company Field", type: "toggle" },
                 { key: "show_role", label: "Role Field", type: "toggle" },
                 { key: "show_video", label: "Video Upload", type: "toggle" },
+                { key: "show_image", label: "Image Upload", type: "toggle" },
               ].map((field) => (
                 <div key={field.key} className="flex items-center justify-between rounded-lg bg-surface-2 p-3">
                   <span className="font-body-sm text-ink">{field.label}</span>
