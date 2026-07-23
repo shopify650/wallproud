@@ -340,6 +340,7 @@ export interface CollectWidgetRow {
   show_phone: boolean;
   phone_required: boolean;
   show_video: boolean;
+  show_image: boolean;
   max_characters: number;
   min_characters: number;
   auto_close_seconds: number;

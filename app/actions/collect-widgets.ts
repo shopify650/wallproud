@@ -40,6 +40,7 @@ const upsertSchema = z.object({
   show_phone: z.boolean().default(false),
   phone_required: z.boolean().default(false),
   show_video: z.boolean().default(false),
+  show_image: z.boolean().default(false),
   max_characters: z.number().int().min(100).max(10000).default(5000),
   min_characters: z.number().int().min(1).max(1000).default(10),
   auto_close_seconds: z.number().int().min(0).max(30).default(3),

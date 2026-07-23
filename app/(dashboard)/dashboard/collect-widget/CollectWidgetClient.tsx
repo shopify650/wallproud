@@ -36,6 +36,7 @@ interface FormState {
   show_phone: boolean;
   phone_required: boolean;
   show_video: boolean;
+  show_image: boolean;
   max_characters: number;
   min_characters: number;
   auto_close_seconds: number;
@@ -67,6 +68,7 @@ const defaultForm: FormState = {
   show_phone: false,
   phone_required: false,
   show_video: false,
+  show_image: false,
   max_characters: 5000,
   min_characters: 10,
   auto_close_seconds: 3,
@@ -100,6 +102,7 @@ function widgetToForm(w: CollectWidgetRow): FormState {
     show_phone: w.show_phone,
     phone_required: w.phone_required,
     show_video: w.show_video,
+    show_image: w.show_image,
     max_characters: w.max_characters,
     min_characters: w.min_characters,
     auto_close_seconds: w.auto_close_seconds,
@@ -684,6 +687,7 @@ export default function CollectWidgetClient({
                 ["Company", "show_company"],
                 ["Phone", "show_phone"],
                 ["Video URL", "show_video"],
+                ["Image", "show_image"],
               ] as const).map(([label, key]) => (
                 <div key={key}>
                   <label className="flex items-center justify-between py-1">
