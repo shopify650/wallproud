@@ -73,10 +73,10 @@ export default async function CollectPage({
       <div className="w-full max-w-lg">
         <div className="rounded-2xl bg-white shadow-xl shadow-indigo-500/5">
           <div className="border-b border-gray-100 px-6 py-6 text-center">
-            {workspace?.logo_url && (
+            {(request.logo_image || workspace?.logo_url) && (
               <img
-                src={workspace.logo_url}
-                alt={workspace.name}
+                src={request.logo_image || workspace?.logo_url || ""}
+                alt={request.title || workspace?.name || "Logo"}
                 className="mx-auto mb-3 h-12 w-12 rounded-xl object-cover"
               />
             )}

@@ -33,6 +33,7 @@ export async function getCollectionRequest(slug: string): Promise<{
   brand_color: string;
   field_config: Record<string, any>;
   redirect_url: string | null;
+  logo_image: string | null;
   workspace: {
     id: string;
     name: string;
@@ -175,6 +176,66 @@ export async function uploadVideo(
   return { success: true, url: urlData.publicUrl };
 }
 
+export async function uploadCollectionImage(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string; url?: string }> {
+  const raw = formData.get("file");
+  if (!(raw instanceof File)) {
+    return { success: false, error: "Missing file" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const {
+    data: workspace,
+    error: wsError,
+  } = await supabase
+    .from("workspaces")
+    .select("id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (wsError || !workspace) return { success: false, error: "Workspace not found" };
+
+  const maxBytes = 2 * 1024 * 1024;
+  if (raw.size === 0 || raw.size > maxBytes) {
+    return { success: false, error: "Image must be between 1 byte and 2 MB" };
+  }
+
+  const contentType = (raw.type || "image/png").split(";")[0];
+  const allowed = ["image/png", "image/jpeg", "image/webp"];
+  if (!allowed.includes(contentType)) {
+    return { success: false, error: "Only PNG, JPG, or WebP images are allowed" };
+  }
+
+  const ext = contentType.split("/")[1] || "png";
+  const fileName = `collection-${workspace.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const buffer = Buffer.from(await raw.arrayBuffer());
+
+  const { error: uploadError } = await supabase.storage
+    .from("collection-images")
+    .upload(fileName, buffer, {
+      contentType,
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
+  }
+
+  const { data: urlData } = supabase.storage
+    .from("collection-images")
+    .getPublicUrl(fileName);
+
+  return { success: true, url: urlData.publicUrl };
+}
+
 const createCollectionSchema = z.object({
   workspaceId: z.string().uuid(),
   recipientEmail: z.string().email().max(255),
@@ -187,6 +248,7 @@ const createCollectionSchema = z.object({
   brandColor: z.string().max(20).optional().or(z.literal("")),
   fieldConfig: z.record(z.string(), z.any()).optional(),
   redirectUrl: z.string().url().optional().or(z.literal("")),
+  logoImage: z.string().url().optional().nullable().or(z.literal("")),
 });
 
 export async function createCollection(
@@ -219,6 +281,7 @@ export async function createCollection(
     brand_color: parsed.data.brandColor || "#000000",
     field_config: parsed.data.fieldConfig || {},
     redirect_url: parsed.data.redirectUrl || null,
+    logo_image: parsed.data.logoImage || null,
   });
 
   if (error) return { success: false, error: error.message };
@@ -237,6 +300,7 @@ export async function updateCollection(
     brandColor?: string;
     fieldConfig?: Record<string, any>;
     redirectUrl?: string;
+    logoImage?: string;
   },
 ): Promise<{ success: boolean; error?: string }> {
   if (!id) return { success: false, error: "Missing collection id" };
@@ -251,6 +315,7 @@ export async function updateCollection(
   if (input.brandColor !== undefined) updateData.brand_color = input.brandColor;
   if (input.fieldConfig !== undefined) updateData.field_config = input.fieldConfig;
   if (input.redirectUrl !== undefined) updateData.redirect_url = input.redirectUrl || null;
+  if (input.logoImage !== undefined) updateData.logo_image = input.logoImage || null;
 
   const { error } = await supabase
     .from("collection_requests")

@@ -187,6 +187,14 @@ export interface CollectionRequest {
   token: string | null;
   expires_at: string | null;
   created_at: string;
+  title: string;
+  description: string;
+  button_text: string;
+  thank_you_message: string;
+  brand_color: string;
+  field_config: Record<string, any>;
+  redirect_url: string | null;
+  logo_image: string | null;
 }
 
 export interface CollectionRequestInsert {
@@ -196,6 +204,14 @@ export interface CollectionRequestInsert {
   status?: "pending" | "sent" | "completed" | "expired";
   token?: string | null;
   expires_at?: string | null;
+  title?: string;
+  description?: string;
+  button_text?: string;
+  thank_you_message?: string;
+  brand_color?: string;
+  field_config?: Record<string, any>;
+  redirect_url?: string | null;
+  logo_image?: string | null;
 }
 
 export interface CollectionRequestUpdate {
@@ -204,6 +220,14 @@ export interface CollectionRequestUpdate {
   status?: "pending" | "sent" | "completed" | "expired";
   token?: string | null;
   expires_at?: string | null;
+  title?: string;
+  description?: string;
+  button_text?: string;
+  thank_you_message?: string;
+  brand_color?: string;
+  field_config?: Record<string, any>;
+  redirect_url?: string | null;
+  logo_image?: string | null;
 }
 
 export interface CollectWidget {

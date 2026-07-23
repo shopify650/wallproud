@@ -19,6 +19,7 @@ export type CollectionRequest = {
   brand_color: string;
   field_config: Record<string, any>;
   redirect_url: string | null;
+  logo_image: string | null;
 };
 
 export default async function CollectionsPage() {

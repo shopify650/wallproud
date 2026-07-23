@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import {
   Link2, Copy, Check, Plus, Trash2, Send, Clock, CheckCircle2, XCircle,
-  Pencil, X,
+  Pencil, X, Upload,
 } from "lucide-react";
-import { createCollection, deleteCollection, updateCollection } from "@/app/actions/collect";
+import { createCollection, deleteCollection, updateCollection, uploadCollectionImage } from "@/app/actions/collect";
 
 type CollectionRequest = {
   id: string;
@@ -25,6 +25,7 @@ type CollectionRequest = {
   brand_color: string;
   field_config: Record<string, any>;
   redirect_url: string | null;
+  logo_image: string | null;
 };
 
 const statusMeta: Record<CollectionRequest["status"], { label: string; icon: typeof Clock; className: string }> = {
@@ -63,7 +64,11 @@ function EditModal({ collection, onClose, onSave }: {
     brandColor: collection.brand_color || "#000000",
     redirectUrl: collection.redirect_url || "",
     fieldConfig: collection.field_config || defaultFieldConfig,
+    logoImage: collection.logo_image || "",
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(collection.logo_image || null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const updateField = (key: string, value: any) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -74,6 +79,31 @@ function EditModal({ collection, onClose, onSave }: {
       ...prev,
       fieldConfig: { ...prev.fieldConfig, [key]: value },
     }));
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+    setImagePreview(preview);
+    setUploading(true);
+
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await uploadCollectionImage(fd);
+    setUploading(false);
+
+    if (res.error) {
+      toast.error(res.error);
+      setImagePreview(collection.logo_image || null);
+      return;
+    }
+
+    if (res.url) {
+      setForm(prev => ({ ...prev, logoImage: res.url! }));
+      setImagePreview(res.url);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,6 +169,46 @@ function EditModal({ collection, onClose, onSave }: {
             />
           </div>
 
+          <div>
+            <label className="font-caption text-muted">Logo Image</label>
+            <div className="mt-1 flex items-center gap-3">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="h-12 w-12 rounded-lg object-cover" />
+              ) : (
+                <div className="h-12 w-12 rounded-lg bg-surface-2 flex items-center justify-center">
+                  <Upload className="h-5 w-5 text-muted" />
+                </div>
+              )}
+              <div>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  ref={fileRef}
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="btn-secondary text-xs"
+                  disabled={uploading}
+                >
+                  {imagePreview ? "Change Image" : "Upload Image"}
+                </button>
+                {imagePreview && form.logoImage && (
+                  <button
+                    type="button"
+                    onClick={() => { setImagePreview(null); setForm(prev => ({ ...prev, logoImage: "" })); }}
+                    className="ml-2 text-xs text-muted hover:text-ink"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="mt-1 font-caption text-xs text-muted">PNG, JPG or WebP. Max 2MB.</p>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="font-caption text-muted">Theme Color</label>
@@ -202,7 +272,7 @@ function EditModal({ collection, onClose, onSave }: {
             <button type="button" onClick={onClose} className="btn-secondary">
               Cancel
             </button>
-            <button type="submit" disabled={saving} className="btn-primary">
+            <button type="submit" disabled={saving || uploading} className="btn-primary">
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
@@ -270,7 +340,16 @@ export default function CollectionsClient({
   }, []);
 
   const handleSaveEdit = useCallback(async (id: string, data: any) => {
-    const res = await updateCollection(id, data);
+    const res = await updateCollection(id, {
+      title: data.title,
+      description: data.description,
+      buttonText: data.buttonText,
+      thankYouMessage: data.thankYouMessage,
+      brandColor: data.brandColor,
+      fieldConfig: data.fieldConfig,
+      redirectUrl: data.redirectUrl,
+      logoImage: data.logoImage,
+    });
     if (res.error) {
       toast.error(res.error);
       return;
