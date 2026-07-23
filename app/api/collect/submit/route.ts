@@ -16,7 +16,7 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { widgetId, content, rating, authorName, authorEmail, authorCompany, pageUrl, referrer } = body;
+    const { widgetId, content, rating, authorName, authorEmail, authorImage, authorCompany, pageUrl, referrer } = body;
 
     if (!widgetId || !content) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: { "Access-Control-Allow-Origin": "*" } });
@@ -41,9 +41,10 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase.rpc("submit_collect_widget_testimonial", {
       p_widget_id: widgetId,
       p_author_name: authorName || "Anonymous",
-      p_author_email: authorEmail || null,
-      p_author_company: authorCompany || null,
       p_content: sanitized,
+      p_author_email: authorEmail || null,
+      p_author_image: authorImage || null,
+      p_author_company: authorCompany || null,
       p_rating: rating ? parseInt(rating) : null,
       p_page_url: pageUrl || null,
       p_referrer: referrer || null,

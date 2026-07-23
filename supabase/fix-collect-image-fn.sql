@@ -1,11 +1,11 @@
 create or replace function public.submit_collect_widget_testimonial(
   p_widget_id uuid,
   p_author_name text,
+  p_content text,
   p_author_email text default null,
   p_author_image text default null,
   p_author_company text default null,
   p_author_role text default null,
-  p_content text,
   p_rating integer default null,
   p_page_url text default null,
   p_referrer text default null,
