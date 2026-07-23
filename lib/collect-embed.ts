@@ -58,6 +58,8 @@ var WID='${w.id}';
 var API='${origin}';
 var panelPosCSS='${panelPosCSS}';
 var isPopup=${isPopup};
+var panelClosedTransform='${isPopup ? "translate(-50%,-46%) scale(0.96)" : w.position === "bottom-center" ? "translateX(-50%) translateY(20px)" : "translateY(20px)"}';
+var panelOpenTransform='${isPopup ? "translate(-50%,-50%) scale(1)" : w.position === "bottom-center" ? "translateX(-50%) translateY(0)" : "translateY(0)"}';
 
 var cid='wp-collect-'+WID;
 if(document.getElementById(cid))return;
