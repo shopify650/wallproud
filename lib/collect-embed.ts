@@ -203,14 +203,14 @@ if(tb)tb.addEventListener('click',function(){pn.classList.toggle('open')});
 ` : w.display_type === 'inline' ? '' : `pn.classList.add('open');`+(isPopup ? 'bd.classList.add("open");' : '')}
 
 $('cb').addEventListener('click',function(){
-  if(w.display_type !== 'inline'){
+  if(${w.display_type} !== 'inline'){
     pn.classList.remove('open');
     ${isPopup ? 'bd.classList.remove("open");' : ''}
   }
 });
 
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape' && pn.classList.contains('open') && w.display_type !== 'inline'){
+  if(e.key==='Escape' && pn.classList.contains('open') && ${w.display_type} !== 'inline'){
     pn.classList.remove('open');
     ${isPopup ? 'bd.classList.remove("open");' : ''}
   }
@@ -265,7 +265,7 @@ for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl
 var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
 cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
 ` : ''}
-setTimeout(function(){if(w.display_type !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);
+setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);
 }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
 }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
 });
