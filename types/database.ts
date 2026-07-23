@@ -195,6 +195,7 @@ export interface CollectionRequest {
   field_config: Record<string, any>;
   redirect_url: string | null;
   logo_image: string | null;
+  show_powered_by?: boolean;
 }
 
 export interface CollectionRequestInsert {
@@ -212,6 +213,7 @@ export interface CollectionRequestInsert {
   field_config?: Record<string, any>;
   redirect_url?: string | null;
   logo_image?: string | null;
+  show_powered_by?: boolean;
 }
 
 export interface CollectionRequestUpdate {
@@ -228,6 +230,7 @@ export interface CollectionRequestUpdate {
   field_config?: Record<string, any>;
   redirect_url?: string | null;
   logo_image?: string | null;
+  show_powered_by?: boolean;
 }
 
 export interface CollectWidget {

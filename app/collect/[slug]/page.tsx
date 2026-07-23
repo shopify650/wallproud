@@ -99,8 +99,17 @@ export default async function CollectPage({
               brandColor: request.brand_color,
               fieldConfig: request.field_config as any,
               redirectUrl: request.redirect_url ?? undefined,
+              showPoweredBy: request.show_powered_by ?? true,
             }}
           />
+
+          {request.show_powered_by !== false && (
+            <div className="border-t border-gray-100 px-6 py-4 text-center">
+              <p className="font-caption text-xs text-gray-400">
+                Powered by <a href="https://wallproud.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">WallProud</a>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

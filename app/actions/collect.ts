@@ -34,6 +34,8 @@ export async function getCollectionRequest(slug: string): Promise<{
   field_config: Record<string, any>;
   redirect_url: string | null;
   logo_image: string | null;
+  show_powered_by: boolean;
+  plan: string;
   workspace: {
     id: string;
     name: string;
@@ -53,16 +55,26 @@ export async function getCollectionRequest(slug: string): Promise<{
   if (error || !request) return null;
 
   let workspace = null;
+  let plan = "free";
   if (request.workspace_id) {
     const { data: ws } = await supabase
       .from("workspaces")
-      .select("id, name, slug, logo_url, primary_color")
+      .select("id, name, slug, logo_url, primary_color, user_id")
       .eq("id", request.workspace_id)
       .single();
+
     workspace = ws;
+    if (workspace?.user_id) {
+      const { data: profile } = await supabase
+        .from("users")
+        .select("plan")
+        .eq("id", workspace.user_id)
+        .single();
+      plan = (profile?.plan as string) || "free";
+    }
   }
 
-  return { ...(request as any), workspace };
+  return { ...(request as any), workspace, plan, show_powered_by: request.show_powered_by ?? true };
 }
 
 export async function submitTestimonial(
@@ -301,6 +313,7 @@ export async function updateCollection(
     fieldConfig?: Record<string, any>;
     redirectUrl?: string;
     logoImage?: string;
+    showPoweredBy?: boolean;
   },
 ): Promise<{ success: boolean; error?: string }> {
   if (!id) return { success: false, error: "Missing collection id" };
@@ -316,6 +329,7 @@ export async function updateCollection(
   if (input.fieldConfig !== undefined) updateData.field_config = input.fieldConfig;
   if (input.redirectUrl !== undefined) updateData.redirect_url = input.redirectUrl || null;
   if (input.logoImage !== undefined) updateData.logo_image = input.logoImage || null;
+  if (input.showPoweredBy !== undefined) updateData.show_powered_by = input.showPoweredBy;
 
   const { error } = await supabase
     .from("collection_requests")

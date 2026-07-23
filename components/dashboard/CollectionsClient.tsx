@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { createCollection, deleteCollection, updateCollection, uploadCollectionImage } from "@/app/actions/collect";
 
-type CollectionRequest = {
+export type CollectionRequest = {
   id: string;
   workspace_id: string;
   recipient_email: string;
@@ -26,6 +26,7 @@ type CollectionRequest = {
   field_config: Record<string, any>;
   redirect_url: string | null;
   logo_image: string | null;
+  show_powered_by: boolean;
 };
 
 const statusMeta: Record<CollectionRequest["status"], { label: string; icon: typeof Clock; className: string }> = {
@@ -50,11 +51,13 @@ const defaultFieldConfig = {
   max_characters: 5000,
 };
 
-function EditModal({ collection, onClose, onSave }: {
+function EditModal({ collection, onClose, onSave, plan }: {
   collection: CollectionRequest;
   onClose: () => void;
   onSave: (id: string, data: any) => Promise<void>;
+  plan: string;
 }) {
+  const isFree = plan === "free";
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     title: collection.title || "Share your feedback",
@@ -65,6 +68,7 @@ function EditModal({ collection, onClose, onSave }: {
     redirectUrl: collection.redirect_url || "",
     fieldConfig: collection.field_config || defaultFieldConfig,
     logoImage: collection.logo_image || "",
+    showPoweredBy: collection.show_powered_by ?? true,
   });
   const [imagePreview, setImagePreview] = useState<string | null>(collection.logo_image || null);
   const [uploading, setUploading] = useState(false);
@@ -241,6 +245,24 @@ function EditModal({ collection, onClose, onSave }: {
             </div>
           </div>
 
+          <div className="flex items-center justify-between rounded-lg bg-surface-2 p-3">
+            <div>
+              <span className="font-body-sm text-ink">Show "Powered by WallProud"</span>
+              {isFree && (
+                <span className="ml-2 font-caption text-xs text-muted">(required on free plan)</span>
+              )}
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={form.showPoweredBy}
+                onChange={(e) => updateField("showPoweredBy", e.target.checked)}
+                disabled={isFree}
+                className="h-4 w-4 rounded border-hairline bg-surface-1 text-accent focus:ring-accent disabled:opacity-50"
+              />
+            </label>
+          </div>
+
           <div>
             <p className="font-caption text-ink">Form Fields</p>
             <p className="font-caption mt-1 text-muted">Choose which fields to show in the collection form.</p>
@@ -283,10 +305,11 @@ function EditModal({ collection, onClose, onSave }: {
 }
 
 export default function CollectionsClient({
-  collections, workspaceId,
+  collections, workspaceId, plan,
 }: {
   collections: CollectionRequest[];
   workspaceId: string;
+  plan: string;
 }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -349,6 +372,7 @@ export default function CollectionsClient({
       fieldConfig: data.fieldConfig,
       redirectUrl: data.redirectUrl,
       logoImage: data.logoImage,
+      showPoweredBy: data.showPoweredBy,
     });
     if (res.error) {
       toast.error(res.error);
@@ -491,6 +515,7 @@ export default function CollectionsClient({
           collection={editingCollection}
           onClose={() => setEditingId(null)}
           onSave={handleSaveEdit}
+          plan={plan}
         />
       )}
     </div>

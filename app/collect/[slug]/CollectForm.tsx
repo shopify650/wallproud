@@ -28,6 +28,7 @@ type CollectionConfig = {
   brandColor?: string;
   fieldConfig?: FieldConfig;
   redirectUrl?: string;
+  showPoweredBy?: boolean;
 };
 
 function fireConfetti(color: string) {

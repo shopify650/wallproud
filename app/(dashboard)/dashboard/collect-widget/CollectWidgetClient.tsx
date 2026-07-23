@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import {
   Plus, Trash2, Copy, Check, Code2, Settings,
-  Eye, MousePointerClick, Timer,
+  Eye, MousePointerClick, Timer, Smartphone, Monitor, Star, X, MessageCircle,
 } from "lucide-react";
 import type { CollectWidgetRow } from "@/lib/supabase/types";
 import { upsertCollectWidget, deleteCollectWidget } from "@/app/actions/collect-widgets";
@@ -109,6 +109,256 @@ function widgetToForm(w: CollectWidgetRow): FormState {
     is_active: w.is_active,
   };
 }
+
+function OnSiteWidgetPreview({ form }: { form: FormState }) {
+  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const [isOpen, setIsOpen] = useState(true);
+  const [starRating, setStarRating] = useState<number | null>(4);
+  const [content, setContent] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const isPopup = form.display_type === "popup";
+  const isFloating = form.display_type === "floating";
+
+  const posClass = form.position === "bottom-left"
+    ? "left-6"
+    : form.position === "bottom-center"
+    ? "left-1/2 -translate-x-1/2"
+    : "right-6";
+
+  return (
+    <div className="card-hairline overflow-hidden rounded-2xl bg-surface-1 p-5 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline pb-3">
+        <div className="flex items-center gap-2">
+          <Eye className="h-4 w-4 text-accent" />
+          <h3 className="font-display-md text-ink text-sm">Interactive Responsive Preview</h3>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg bg-surface-2 p-1">
+            <button
+              onClick={() => setDevice("desktop")}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                device === "desktop" ? "bg-surface-1 text-ink shadow-sm" : "text-muted hover:text-ink"
+              }`}
+            >
+              <Monitor className="h-3.5 w-3.5" /> Desktop
+            </button>
+            <button
+              onClick={() => setDevice("mobile")}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                device === "mobile" ? "bg-surface-1 text-ink shadow-sm" : "text-muted hover:text-ink"
+              }`}
+            >
+              <Smartphone className="h-3.5 w-3.5" /> Mobile
+            </button>
+          </div>
+
+          {(isPopup || isFloating) && (
+            <button
+              onClick={() => { setIsOpen(!isOpen); setSubmitted(false); }}
+              className="btn-secondary text-xs py-1 px-3"
+            >
+              {isOpen ? "Close Preview" : "Open Preview"}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Simulated Web Page Container */}
+      <div className="flex justify-center bg-gray-900/5 p-4 rounded-xl">
+        <div
+          className={`relative min-h-[460px] w-full overflow-hidden rounded-xl border border-hairline bg-white shadow-sm transition-all duration-300 ${
+            device === "mobile" ? "max-w-[375px]" : "max-w-full"
+          }`}
+        >
+          {/* Mock Browser Top Header */}
+          <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/80 px-4 py-2">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+            </div>
+            <span className="text-[11px] text-gray-400 font-mono">yourwebsite.com</span>
+            <span className="w-10" />
+          </div>
+
+          {/* Mock Web Page Skeleton Content */}
+          <div className="p-6 space-y-4 opacity-30 select-none pointer-events-none">
+            <div className="h-7 w-2/3 rounded-lg bg-gray-300" />
+            <div className="h-3.5 w-full rounded bg-gray-200" />
+            <div className="h-3.5 w-5/6 rounded bg-gray-200" />
+            <div className="grid grid-cols-2 gap-3 pt-3 sm:grid-cols-3">
+              <div className="h-20 rounded-lg bg-gray-200" />
+              <div className="h-20 rounded-lg bg-gray-200" />
+              <div className="h-20 hidden rounded-lg bg-gray-200 sm:block" />
+            </div>
+          </div>
+
+          {/* Floating Widget Trigger Button */}
+          {isFloating && (
+            <button
+              onClick={() => { setIsOpen(!isOpen); setSubmitted(false); }}
+              style={{ backgroundColor: form.primary_color }}
+              className={`absolute bottom-4 ${posClass} flex h-12 w-12 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 active:scale-95 z-10`}
+            >
+              <MessageCircle className="h-5 w-5" />
+            </button>
+          )}
+
+          {/* Popup Modal Backdrop */}
+          {isPopup && isOpen && (
+            <div
+              onClick={() => setIsOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm z-20 transition-opacity"
+            />
+          )}
+
+          {/* Responsive Modal / Panel Content */}
+          {((isPopup && isOpen) || (isFloating && isOpen) || form.display_type === "inline") && (
+            <div
+              className={`bg-white shadow-2xl flex flex-col transition-all duration-300 ${
+                form.display_type === "inline"
+                  ? "relative mx-auto my-4 w-[92%] max-w-[480px] rounded-2xl border border-gray-100"
+                  : isPopup
+                  ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-[calc(100%-24px)] max-w-[460px] max-h-[calc(100%-24px)] rounded-2xl border border-gray-100"
+                  : `absolute bottom-16 ${posClass} z-20 w-[calc(100%-24px)] max-w-[380px] max-h-[calc(100%-80px)] rounded-2xl border border-gray-100`
+              }`}
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between p-4 pb-0">
+                <div>
+                  <h4 className="font-bold text-gray-900 text-base leading-snug">{form.heading}</h4>
+                  {form.description && (
+                    <p className="mt-0.5 text-xs text-gray-500">{form.description}</p>
+                  )}
+                </div>
+                {form.display_type !== "inline" && (
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg border border-gray-200 p-1 text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Form Body */}
+              {submitted ? (
+                <div className="p-6 text-center space-y-2">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
+                    <Check className="h-6 w-6" />
+                  </div>
+                  <h5 className="font-bold text-gray-900 text-base">{form.thank_you_message}</h5>
+                  <p className="text-xs text-gray-500">Your feedback has been received.</p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="text-xs text-accent underline mt-2 inline-block"
+                  >
+                    Reset preview
+                  </button>
+                </div>
+              ) : (
+                <div className="p-4 space-y-3 overflow-y-auto max-h-[340px]">
+                  {form.show_star_rating && (
+                    <div className="flex justify-center gap-1 py-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setStarRating(star)}
+                          className="p-1 transition-transform hover:scale-110"
+                        >
+                          <Star
+                            className="h-6 w-6"
+                            style={{
+                              color: starRating && star <= starRating ? "#fbbf24" : "#d1d5db",
+                              fill: starRating && star <= starRating ? "#fbbf24" : "transparent",
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div>
+                    <textarea
+                      rows={3}
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder={form.placeholder}
+                      className="w-full rounded-xl border border-gray-200 p-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                    <div className="mt-0.5 text-right text-[10px] text-gray-400">
+                      {content.length} / {form.max_characters}
+                    </div>
+                  </div>
+
+                  {form.show_name && (
+                    <input
+                      type="text"
+                      placeholder={`Your name${form.name_required ? " *" : ""}`}
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                  )}
+
+                  {form.show_email && (
+                    <input
+                      type="email"
+                      placeholder={`Email${form.email_required ? " *" : ""}`}
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                  )}
+
+                  {form.show_company && (
+                    <input
+                      type="text"
+                      placeholder={`Company${form.company_required ? " *" : ""}`}
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                  )}
+
+                  {form.show_phone && (
+                    <input
+                      type="tel"
+                      placeholder={`Phone${form.phone_required ? " *" : ""}`}
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                  )}
+
+                  {form.show_video && (
+                    <input
+                      type="url"
+                      placeholder="Video URL"
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
+                    />
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(true)}
+                    style={{ backgroundColor: form.primary_color }}
+                    className="w-full rounded-xl py-2.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:scale-[0.99]"
+                  >
+                    Submit Testimonial
+                  </button>
+                </div>
+              )}
+
+              {/* Footer */}
+              {form.show_powered_by && (
+                <div className="border-t border-gray-100 p-2.5 text-center text-[10px] text-gray-400">
+                  Powered by <span className="font-semibold text-gray-600">WallProud</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 export default function CollectWidgetClient({
   workspaceId,
@@ -562,6 +812,9 @@ export default function CollectWidgetClient({
               )}
             </div>
           </div>
+          
+          {/* Interactive Live Responsive Preview */}
+          <OnSiteWidgetPreview form={form} />
         </div>
       )}
 
@@ -614,6 +867,9 @@ export default function CollectWidgetClient({
               </div>
             </div>
           </div>
+
+          {/* Interactive Live Responsive Preview */}
+          <OnSiteWidgetPreview form={form} />
         </div>
       )}
     </div>

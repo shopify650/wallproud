@@ -1,26 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/auth-utils";
-import CollectionsClient from "@/components/dashboard/CollectionsClient";
-
-export type CollectionRequest = {
-  id: string;
-  workspace_id: string;
-  recipient_email: string;
-  recipient_name: string | null;
-  status: "pending" | "sent" | "completed" | "expired";
-  token: string | null;
-  expires_at: string | null;
-  created_at: string;
-  title: string;
-  description: string;
-  button_text: string;
-  thank_you_message: string;
-  brand_color: string;
-  field_config: Record<string, any>;
-  redirect_url: string | null;
-  logo_image: string | null;
-};
+import CollectionsClient, { CollectionRequest } from "@/components/dashboard/CollectionsClient";
 
 export default async function CollectionsPage() {
   const supabase = await createClient();
@@ -34,6 +15,14 @@ export default async function CollectionsPage() {
 
   if (!workspace) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("users")
+    .select("plan")
+    .eq("id", authUser.id)
+    .single();
+
+  const plan = (profile?.plan as string) || "free";
+
   const { data: collections } = await supabase
     .from("collection_requests")
     .select("*")
@@ -44,6 +33,7 @@ export default async function CollectionsPage() {
     <CollectionsClient
       collections={(collections || []) as CollectionRequest[]}
       workspaceId={workspace.id}
+      plan={plan}
     />
   );
 }
