@@ -259,23 +259,7 @@ if(fm)fm.addEventListener('submit',function(e){
   ${w.show_company ? `b.authorCompany=($('co')?$('co').value:'').trim();` : ''}
   ${w.show_image ? `
   var im=$('im');
-  var submitFn=function(){
-    fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
-    .then(function(r){return r.json()}).then(function(d){
-    if(d.success){
-      fm.style.display='none';$('sc').style.display='block';
-      ${w.show_confetti ? `
-      var cf=document.createElement('div');cf.className='cfetti';
-      var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
-      for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}
-      var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
-      cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
-      ` : ''}
-      setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);
-    }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
-    }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
-  };
-  if(im&&im.files&&im.files[0]){var imfd=new FormData();imfd.append('file',im.files[0]);fetch(API+'/api/upload/image',{method:'POST',body:imfd}).then(function(r){return r.json()}).then(function(d){b.authorImage=d.url;submitFn()}).catch(function(){submitFn()})}else{submitFn()}
+  if(im&&im.files&&im.files[0]){var imfd=new FormData();imfd.append('file',im.files[0]);fetch(API+'/api/upload/image',{method:'POST',body:imfd}).then(function(r){return r.json()}).then(function(d){b.authorImage=d.url;fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success){fm.style.display='none';$('sc').style.display='block';${w.show_confetti ? `var cf=document.createElement('div');cf.className='cfetti';var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);` : ''}setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);}else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}})}).catch(function(){fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success){fm.style.display='none';$('sc').style.display='block';${w.show_confetti ? `var cf=document.createElement('div');cf.className='cfetti';var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);` : ''}setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);}else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}})}
   ` : `
   fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
   .then(function(r){return r.json()}).then(function(d){
