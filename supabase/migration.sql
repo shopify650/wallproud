@@ -34,8 +34,14 @@ create table if not exists public.users (
 alter table public.users add column if not exists plan                text        not null default 'free' check (plan in ('free', 'starter', 'pro', 'agency'));
 alter table public.users add column if not exists stripe_customer_id  text;
 alter table public.users add column if not exists stripe_subscription_id text;
+alter table public.users add column if not exists whop_customer_id  text;
+alter table public.users add column if not exists whop_subscription_id text;
 alter table public.users add column if not exists created_at          timestamptz not null default now();
 alter table public.users add column if not exists updated_at          timestamptz not null default now();
+
+drop index if exists public.idx_users_stripe_customer_id;
+create index idx_users_stripe_customer_id on public.users(stripe_customer_id);
+create index idx_users_whop_customer_id on public.users(whop_customer_id);
 
 -- 3b. WORKSPACES
 create table if not exists public.workspaces (

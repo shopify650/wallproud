@@ -1,6 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { createClient } from "@/lib/supabase/client";
 
 const plans = [
   {
@@ -20,6 +25,7 @@ const plans = [
     cta: "Get started",
     href: "/signup",
     highlighted: false,
+    planKey: null,
   },
   {
     name: "Pro",
@@ -41,6 +47,7 @@ const plans = [
     cta: "Start free trial",
     href: "/signup",
     highlighted: true,
+    planKey: "pro",
   },
   {
     name: "Agency",
@@ -62,10 +69,50 @@ const plans = [
     cta: "Contact us",
     href: "/signup",
     highlighted: false,
+    planKey: "agency",
   },
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  const handleCheckout = async (planKey: string | null) => {
+    if (!planKey) {
+      router.push("/signup");
+      return;
+    }
+
+    setLoadingPlan(planKey);
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/signup");
+        return;
+      }
+
+      const res = await fetch("/api/whop/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planKey }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Failed to start checkout");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-30">
@@ -137,15 +184,25 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link
-                href={plan.href}
+              <button
+                onClick={() => handleCheckout(plan.planKey)}
+                disabled={loadingPlan === plan.planKey}
                 className={`mt-8 flex items-center justify-center gap-2 rounded-pill px-4 py-2.5 font-body-sm transition ${
                   plan.highlighted ? "btn-primary" : "btn-secondary"
-                }`}
+                } ${loadingPlan === plan.planKey ? "opacity-70" : ""}`}
               >
-                {plan.cta}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+                {loadingPlan === plan.planKey ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Redirecting...
+                  </>
+                ) : (
+                  <>
+                    {plan.cta}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
             </div>
           ))}
         </div>
