@@ -43,9 +43,8 @@ var SC=${w.show_company};
 var CR=${w.company_required};
 var SP=${w.show_phone};
 var PR=${w.phone_required};
-  var SV=${w.show_video};
-  var SI=${w.show_image};
-  var MX=${w.max_characters};
+var SV=${w.show_video};
+var MX=${w.max_characters};
 var MN=${w.min_characters};
 var AC=${w.auto_close_seconds};
 var CF=${w.show_confetti};
@@ -109,7 +108,6 @@ sh.innerHTML='<style>'
 +'.wp-field-group:focus-within .wp-field-icon{color:'+W+'}'
 +'.wp-field-icon svg{width:18px;height:18px}'
 +'.wp-field-group .wp-field,.wp-field-group input,.wp-field-group textarea{width:100%;padding:14px 0;border:none;background:transparent;font-size:15px;font-family:inherit;color:#111827;outline:none;font-weight:500}'
-+'.wp-field-group input[type="file"]{padding:10px 0;color:#6b7280;font-size:13px}'
 +'.wp-field-group .wp-field::placeholder,.wp-field-group input::placeholder,.wp-field-group textarea::placeholder{color:#b0b7c3;font-weight:400}'
 +'.wp-textarea{width:100%;padding:14px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:15px;font-family:inherit;color:#111827;outline:none;resize:vertical;min-height:100px;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);background:#fff;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,0.04)}'
 +'.wp-textarea::placeholder{color:#b0b7c3;font-weight:400}'
@@ -159,7 +157,6 @@ ${w.display_type === 'floating' ? '#tb{bottom:16px !important;'+(w.position === 
 +(SC?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><input class="wp-field" id="co" placeholder="Company" '+(CR?'required':'')+' /></div>':'')
 +(SP?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><input class="wp-field" id="ph" type="tel" placeholder="Phone" '+(PR?'required':'')+' /></div>':'')
 +(SV?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div><input class="wp-field" id="vi" type="url" placeholder="Video URL" /></div>':'')
-+(SI?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><input class="wp-field" id="im" type="file" accept="image/png,image/jpeg,image/webp" style="padding:10px 0"/></div>':'')
 +'<button type="submit" class="wp-submit" id="sb">Submit Testimonial</button>'
 +'<div class="wp-err" id="er"></div>'
 +'</form>'
@@ -247,35 +244,31 @@ setTimeout(function(){pn.classList.add('open');if(isPopup&&bd)bd.classList.add('
 }
 
 if(fm)fm.addEventListener('submit',function(e){
-  e.preventDefault();
-  var el=$('er');if(el)el.style.display='none';
-  var cv=(ct?ct.value:'').trim();
-  if(cv.length<MN){if(el){el.textContent='Minimum '+MN+' characters';el.style.display='block'}return}
-  if(cv.length>MX){if(el){el.textContent='Maximum '+MX+' characters';el.style.display='block'}return}
-  var sb=$('sb');if(sb){sb.disabled=true;sb.textContent='Submitting...'}
-  var b={widgetId:WID,content:cv,rating:rg,pageUrl:window.location.href,referrer:document.referrer||''};
-  ${w.show_name ? `b.authorName=($('nm')?$('nm').value:'').trim();` : ''}
-  ${w.show_email ? `b.authorEmail=($('em')?$('em').value:'').trim();` : ''}
-  ${w.show_company ? `b.authorCompany=($('co')?$('co').value:'').trim();` : ''}
-  ${w.show_image ? `
-  var im=$('im');
-  if(im&&im.files&&im.files[0]){var imfd=new FormData();imfd.append('file',im.files[0]);fetch(API+'/api/upload/image',{method:'POST',body:imfd}).then(function(r){return r.json()}).then(function(d){b.authorImage=d.url;fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success){fm.style.display='none';$('sc').style.display='block';${w.show_confetti ? `var cf=document.createElement('div');cf.className='cfetti';var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);` : ''}setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);}else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}})}).catch(function(){fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success){fm.style.display='none';$('sc').style.display='block';${w.show_confetti ? `var cf=document.createElement('div');cf.className='cfetti';var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);` : ''}setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);}else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}})}
-  ` : `
-  fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
-  .then(function(r){return r.json()}).then(function(d){
-  if(d.success){
-    fm.style.display='none';$('sc').style.display='block';
-    ${w.show_confetti ? `
-    var cf=document.createElement('div');cf.className='cfetti';
-    var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
-    for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}
-    var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
-    cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
-    ` : ''}
-    setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);
-  }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
-  }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
-  `}
-);
+e.preventDefault();
+var el=$('er');if(el)el.style.display='none';
+var cv=(ct?ct.value:'').trim();
+if(cv.length<MN){if(el){el.textContent='Minimum '+MN+' characters';el.style.display='block'}return}
+if(cv.length>MX){if(el){el.textContent='Maximum '+MX+' characters';el.style.display='block'}return}
+var sb=$('sb');if(sb){sb.disabled=true;sb.textContent='Submitting...'}
+var b={widgetId:WID,content:cv,rating:rg,pageUrl:window.location.href,referrer:document.referrer||''};
+${w.show_name ? `b.authorName=($('nm')?$('nm').value:'').trim();` : ''}
+${w.show_email ? `b.authorEmail=($('em')?$('em').value:'').trim();` : ''}
+${w.show_company ? `b.authorCompany=($('co')?$('co').value:'').trim();` : ''}
+fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
+.then(function(r){return r.json()}).then(function(d){
+if(d.success){
+fm.style.display='none';$('sc').style.display='block';
+${w.show_confetti ? `
+var cf=document.createElement('div');cf.className='cfetti';
+var cl=['#000000','#ec4899','#f59e0b','#10b981','#ef4444','#8b5cf6'];
+for(var i=0;i<30;i++){var s=document.createElement('span');s.style.background=cl[i%6];s.style.left=Math.random()*200-100+'px';s.style.top=Math.random()*200-100+'px';s.style.animationDelay=Math.random()*0.8+'s';cf.appendChild(s)}
+var cfParent=(document.documentElement && document.documentElement !== document.body) ? document.documentElement : document.body;
+cfParent.appendChild(cf);setTimeout(function(){cf.remove()},2500);
+` : ''}
+setTimeout(function(){if(${w.display_type} !== 'inline'){pn.classList.remove('open')${isPopup ? ';if(bd)bd.classList.remove("open")' : ''}}},AC*1000);
+}else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
+}).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
+});
 })();`;
 }
+
