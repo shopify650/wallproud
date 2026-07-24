@@ -259,8 +259,8 @@ if(fm)fm.addEventListener('submit',function(e){
   ${w.show_company ? `b.authorCompany=($('co')?$('co').value:'').trim();` : ''}
   ${w.show_image ? `
   var im=$('im');
-  function doSubmit(imgUrl){
-    if(imgUrl)b.authorImage=imgUrl;
+  if(im&&im.files&&im.files[0]){var imfd=new FormData();imfd.append('file',im.files[0]);fetch(API+'/api/upload/image',{method:'POST',body:imfd}).then(function(r){return r.json()}).then(function(d){b.authorImage=d.url;doSubmit()}).catch(function(){doSubmit()})}else{doSubmit()}
+  function doSubmit(){
     fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
     .then(function(r){return r.json()}).then(function(d){
     if(d.success){
@@ -276,7 +276,6 @@ if(fm)fm.addEventListener('submit',function(e){
     }else{if(el){el.textContent=d.error||'Submission failed';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}}
     }).catch(function(){if(el){el.textContent='Network error. Try again.';el.style.display='block'}if(sb){sb.disabled=false;sb.textContent='Submit Testimonial'}});
   }
-  if(im&&im.files&&im.files[0]){var imfd=new FormData();imfd.append('file',im.files[0]);fetch(API+'/api/upload/image',{method:'POST',body:imfd}).then(function(r){return r.json()}).then(function(d){doSubmit(d.url)}).catch(function(){doSubmit()})}else{doSubmit()}
   ` : `
   fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
   .then(function(r){return r.json()}).then(function(d){
