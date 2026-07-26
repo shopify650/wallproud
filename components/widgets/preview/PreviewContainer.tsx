@@ -19,12 +19,6 @@ const previews: Record<WidgetType, React.ComponentType<{ config: WidgetConfig; t
   minimal: MinimalPreview,
 };
 
-const viewportConfig = {
-  desktop: { width: "100%", minWidth: 720, label: "Desktop" },
-  tablet: { width: 768, label: "Tablet" },
-  mobile: { width: 375, label: "Mobile" },
-};
-
 function DeviceFrame({
   viewport,
   children,
@@ -39,7 +33,6 @@ function DeviceFrame({
       <div
         style={{
           width: "100%",
-          minWidth: 720,
           borderRadius: 8,
           overflow: "hidden",
           border: "1px solid #262626",
@@ -47,6 +40,7 @@ function DeviceFrame({
           boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
         }}
       >
+        {/* Browser chrome bar */}
         <div
           style={{
             display: "flex",
@@ -55,9 +49,10 @@ function DeviceFrame({
             padding: "10px 14px",
             background: "#141414",
             borderBottom: "1px solid #262626",
+            flexShrink: 0,
           }}
         >
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444", display: "inline-block" }} />
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
@@ -65,6 +60,7 @@ function DeviceFrame({
           <div
             style={{
               flex: 1,
+              minWidth: 0,
               height: 20,
               borderRadius: 4,
               background: "#090909",
@@ -79,56 +75,54 @@ function DeviceFrame({
             wallproud.com
           </div>
         </div>
-        <div style={{ background: bg }}>{children}</div>
+        <div style={{ background: bg, overflowX: "auto" }}>{children}</div>
       </div>
     );
   }
 
   if (viewport === "tablet") {
     return (
-      <div
-        style={{
-          width: 768,
-          margin: "0 auto",
-          borderRadius: 28,
-          border: "3px solid #262626",
-          overflow: "hidden",
-          background: "#1c1c1c",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-        }}
-      >
+      /* Outer scroller so 768px frame can scroll horizontally on narrow panels */
+      <div style={{ width: "100%", overflowX: "auto" }}>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "8px 0",
-            background: "#141414",
-            borderBottom: "1px solid #262626",
+            width: 620,
+            minWidth: 620,
+            margin: "0 auto",
+            borderRadius: 24,
+            border: "3px solid #262626",
+            overflow: "hidden",
+            background: "#1c1c1c",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
           }}
         >
-          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid #262626" }} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "8px 0",
+              background: "#141414",
+              borderBottom: "1px solid #262626",
+            }}
+          >
+            <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid #333" }} />
+          </div>
+          <div style={{ background: bg }}>{children}</div>
+          <div style={{ height: 4, width: 60, margin: "8px auto", borderRadius: 2, background: "#262626" }} />
         </div>
-        <div style={{ background: bg }}>{children}</div>
-        <div
-          style={{
-            height: 4,
-            width: 60,
-            margin: "8px auto",
-            borderRadius: 2,
-            background: "#262626",
-          }}
-        />
       </div>
     );
   }
 
+  // Mobile
   return (
     <div
       style={{
-        width: 375,
+        width: 320,
+        minWidth: 320,
         margin: "0 auto",
-        borderRadius: 36,
+        borderRadius: 32,
         border: "3px solid #262626",
         overflow: "hidden",
         background: "#1c1c1c",
@@ -146,16 +140,10 @@ function DeviceFrame({
         }}
       >
         <span style={{ fontSize: 10, color: "#999" }}>9:41</span>
-        <div style={{ width: 10, height: 10, borderRadius: 2, border: "2px solid #262626" }} />
+        <div style={{ width: 10, height: 10, borderRadius: 2, border: "2px solid #333" }} />
       </div>
       <div style={{ background: bg }}>{children}</div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "6px 0",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "center", padding: "6px 0" }}>
         <div style={{ width: 40, height: 4, borderRadius: 2, background: "#262626" }} />
       </div>
     </div>
@@ -179,16 +167,18 @@ export default function PreviewContainer({
   const Preview = previews[type] || GridPreview;
 
   return (
-    <div className="card-hairline flex flex-col bg-surface-1">
+    <div className="card-hairline flex min-w-0 flex-col bg-surface-1">
+      {/* toolbar */}
       <div className="flex items-center justify-between border-b border-hairline px-4 py-2">
         <span className="font-body-sm text-ink">Live preview</span>
         <div className="flex rounded-lg border border-hairline">
-          {(Object.keys(viewportConfig) as ("desktop" | "tablet" | "mobile")[]).map((v) => {
+          {(Object.keys({ desktop: 1, tablet: 1, mobile: 1 }) as ("desktop" | "tablet" | "mobile")[]).map((v) => {
             const Icon = v === "desktop" ? Monitor : v === "tablet" ? Tablet : Smartphone;
             return (
               <button
                 key={v}
                 onClick={() => onViewportChange(v)}
+                title={v.charAt(0).toUpperCase() + v.slice(1)}
                 className={`p-1.5 ${viewport === v ? "bg-surface-2 text-accent" : "text-muted hover:text-ink"}`}
               >
                 <Icon className="h-4 w-4" />
@@ -197,8 +187,13 @@ export default function PreviewContainer({
           })}
         </div>
       </div>
-      <div className="overflow-auto bg-canvas p-4" style={{ minHeight: 420 }}>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+
+      {/* preview area — always scrollable so device frames never escape bounds */}
+      <div
+        className="overflow-auto bg-canvas p-4"
+        style={{ minHeight: 420 }}
+      >
+        <div className="flex min-w-0 justify-center">
           <DeviceFrame viewport={viewport} bg={s.backgroundColor || "#090909"}>
             <Preview config={config} testimonials={testimonials} />
           </DeviceFrame>

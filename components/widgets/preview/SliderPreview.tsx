@@ -27,13 +27,26 @@ export default function SliderPreview({
   const max = config.filter?.maxItems ?? testimonials.length;
   const items = testimonials.slice(0, max);
   const [index, setIndex] = useState(0);
+  const [animating, setAnimating] = useState(false);
   const interval = config.animation?.interval ?? 4000;
   const autoplay = config.animation?.autoplay !== false;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const goTo = useCallback((i: number) => {
+    setAnimating(true);
+    setTimeout(() => {
+      setIndex(i);
+      setAnimating(false);
+    }, 150);
+  }, []);
+
   const next = useCallback(() => {
-    setIndex((i) => (i + 1) % items.length);
-  }, [items.length]);
+    goTo((index + 1) % items.length);
+  }, [goTo, index, items.length]);
+
+  const prev = useCallback(() => {
+    goTo((index - 1 + items.length) % items.length);
+  }, [goTo, index, items.length]);
 
   useEffect(() => {
     if (!autoplay || items.length <= 1) return;
@@ -45,7 +58,7 @@ export default function SliderPreview({
 
   if (items.length === 0) {
     return (
-      <div style={{ background: s.backgroundColor, color: s.textColor, fontFamily: s.fontFamily || "system-ui,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", height: 200, borderRadius: 8, fontSize: 14, opacity: 0.6 }}>
+      <div style={{ background: s.backgroundColor, color: s.textColor, fontFamily: s.fontFamily || "system-ui,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 160, borderRadius: 8, fontSize: 14, opacity: 0.6, padding: 24 }}>
         No testimonials to display
       </div>
     );
@@ -58,38 +71,33 @@ export default function SliderPreview({
       background: s.backgroundColor,
       color: s.textColor,
       fontFamily: s.fontFamily || "system-ui,sans-serif",
-      maxWidth: Math.min(config.layout?.maxWidth || 600, 600),
-      margin: "0 auto",
-      padding: "24px 16px",
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "16px 12px",
     }}>
+      {/* Card with fade animation */}
       <div
-        style={{ position: "relative", overflow: "hidden", minHeight: 180 }}
+        style={{ position: "relative", touchAction: "pan-y" }}
         onTouchStart={(e) => { startX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           const dx = e.changedTouches[0].clientX - startX.current;
-          if (Math.abs(dx) > 40) {
-            if (dx > 0) {
-              setIndex((i) => (i - 1 + items.length) % items.length);
-            } else {
-              next();
-            }
-          }
+          if (Math.abs(dx) > 40) { if (dx > 0) { prev(); } else { next(); } }
         }}
       >
         <div
-          key={index}
           style={{
             borderRadius: s.cardBorderRadius,
             padding: s.cardPadding,
             background: s.cardBackground,
             color: s.textColor,
             boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-            opacity: 1,
-            transition: "opacity 0.6s ease",
+            boxSizing: "border-box",
+            transition: "opacity 0.25s ease",
+            opacity: animating ? 0 : 1,
           }}
         >
           {s.showRating && <Stars rating={t.rating} color={s.accentColor!} />}
-          <div style={{ fontSize: 15, lineHeight: 1.6, wordWrap: "break-word" }}>
+          <div style={{ fontSize: 15, lineHeight: 1.6, wordBreak: "break-word", overflowWrap: "break-word" }}>
             &ldquo;{t.content}&rdquo;
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
@@ -100,62 +108,70 @@ export default function SliderPreview({
                 {(t.author_name || "?").charAt(0).toUpperCase()}
               </span>
             )}
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.author_name}</div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontWeight: 600, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.author_name}</div>
               {s.showAuthorCompany && (t.author_company || t.author_role) && (
                 <div style={{ fontSize: 12, opacity: 0.6 }}>{[t.author_company, t.author_role].filter(Boolean).join(" · ")}</div>
               )}
             </div>
             {s.showDate && (
-              <span style={{ fontSize: 11, opacity: 0.5, marginLeft: "auto", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 11, opacity: 0.5, whiteSpace: "nowrap", flexShrink: 0 }}>
                 {new Date(t.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </span>
             )}
           </div>
         </div>
 
+        {/* Prev / Next arrows */}
         {items.length > 1 && (
-          <>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, gap: 8 }}>
             <button
-              onClick={() => setIndex((i) => (i - 1 + items.length) % items.length)}
+              aria-label="Previous"
+              onClick={prev}
               style={{
-                position: "absolute", left: -4, top: "50%", transform: "translateY(-50%)",
-                width: 32, height: 32, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.9)",
+                flex: "0 0 auto",
+                width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(0,0,0,0.12)",
+                background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.15)", zIndex: 2, fontSize: 16, lineHeight: 1, color: "#333",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)", fontSize: 20, lineHeight: 1, color: "#333",
               }}
             >
-              &#8249;
+              ‹
             </button>
+
+            {/* Dot indicators in the middle */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, flexWrap: "wrap", flex: 1 }}>
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  aria-label={`Go to slide ${i + 1}`}
+                  onClick={() => goTo(i)}
+                  style={{
+                    width: i === index ? 20 : 8,
+                    height: 8, borderRadius: 4, border: "none", cursor: "pointer", padding: 0,
+                    background: i === index ? s.accentColor : "#d1d5db",
+                    transition: "all 0.3s ease",
+                  }}
+                />
+              ))}
+            </div>
+
             <button
+              aria-label="Next"
               onClick={next}
               style={{
-                position: "absolute", right: -4, top: "50%", transform: "translateY(-50%)",
-                width: 32, height: 32, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.9)",
+                flex: "0 0 auto",
+                width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(0,0,0,0.12)",
+                background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.15)", zIndex: 2, fontSize: 16, lineHeight: 1, color: "#333",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)", fontSize: 20, lineHeight: 1, color: "#333",
               }}
             >
-              &#8250;
+              ›
             </button>
-          </>
+          </div>
         )}
       </div>
-
-      {items.length > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 16 }}>
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              style={{
-                width: 8, height: 8, borderRadius: "50%", border: "none", cursor: "pointer", padding: 0,
-                background: i === index ? s.accentColor : "#d1d5db", transition: "background 0.3s",
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

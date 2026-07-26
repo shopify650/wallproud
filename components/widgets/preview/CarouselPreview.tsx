@@ -25,11 +25,10 @@ function CardBody({ t, config }: { t: any; config: WidgetConfig }) {
       background: s.cardBackground,
       color: s.textColor,
       boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-      height: "100%",
       boxSizing: "border-box",
     }}>
       {s.showRating && <Stars rating={t.rating} color={s.accentColor!} />}
-      <div style={{ fontSize: 15, lineHeight: 1.6, wordWrap: "break-word" }}>
+      <div style={{ fontSize: 15, lineHeight: 1.6, wordBreak: "break-word", overflowWrap: "break-word" }}>
         &ldquo;{t.content}&rdquo;
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
@@ -40,14 +39,14 @@ function CardBody({ t, config }: { t: any; config: WidgetConfig }) {
             {(t.author_name || "?").charAt(0).toUpperCase()}
           </span>
         )}
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.author_name}</div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontWeight: 600, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.author_name}</div>
           {s.showAuthorCompany && (t.author_company || t.author_role) && (
             <div style={{ fontSize: 12, opacity: 0.6 }}>{[t.author_company, t.author_role].filter(Boolean).join(" · ")}</div>
           )}
         </div>
         {s.showDate && (
-          <span style={{ fontSize: 11, opacity: 0.5, marginLeft: "auto", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 11, opacity: 0.5, whiteSpace: "nowrap", flexShrink: 0 }}>
             {new Date(t.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
           </span>
         )}
@@ -71,9 +70,7 @@ export default function CarouselPreview({
   const autoplay = config.animation?.autoplay !== false;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const goTo = useCallback((i: number) => {
-    setIndex(i);
-  }, []);
+  const goTo = useCallback((i: number) => setIndex(i), []);
 
   const next = useCallback(() => {
     setIndex((i) => (i + 1) % items.length);
@@ -93,7 +90,7 @@ export default function CarouselPreview({
 
   if (items.length === 0) {
     return (
-      <div style={{ background: s.backgroundColor, color: s.textColor, fontFamily: s.fontFamily || "system-ui,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", height: 200, borderRadius: 8, fontSize: 14, opacity: 0.6 }}>
+      <div style={{ background: s.backgroundColor, color: s.textColor, fontFamily: s.fontFamily || "system-ui,sans-serif", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 160, borderRadius: 8, fontSize: 14, opacity: 0.6, padding: 24 }}>
         No testimonials to display
       </div>
     );
@@ -104,63 +101,80 @@ export default function CarouselPreview({
       background: s.backgroundColor,
       color: s.textColor,
       fontFamily: s.fontFamily || "system-ui,sans-serif",
-      maxWidth: config.layout?.maxWidth || 1000,
-      margin: "0 auto",
-      padding: "24px 16px",
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "16px 12px",
     }}>
-      <div style={{ position: "relative", overflow: "hidden" }}>
+      {/* Slide track */}
+      <div
+        style={{ position: "relative", overflow: "hidden", touchAction: "pan-y" }}
+        onTouchStart={(e) => { startX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          const dx = e.changedTouches[0].clientX - startX.current;
+          if (Math.abs(dx) > 40) { if (dx > 0) { prev(); } else { next(); } }
+        }}
+      >
         <div
-          style={{ display: "flex", transition: "transform 0.5s ease", transform: `translateX(-${index * 100}%)` }}
-          onTouchStart={(e) => { startX.current = e.touches[0].clientX; }}
-          onTouchEnd={(e) => {
-            const dx = e.changedTouches[0].clientX - startX.current;
-            if (Math.abs(dx) > 40) { if (dx > 0) { prev(); } else { next(); } }
+          style={{
+            display: "flex",
+            transition: "transform 0.45s cubic-bezier(0.4,0,0.2,1)",
+            transform: `translateX(-${index * 100}%)`,
+            willChange: "transform",
           }}
         >
           {items.map((t) => (
-            <div key={t.id} style={{ minWidth: "100%", padding: "0 4px", boxSizing: "border-box" }}>
+            <div key={t.id} style={{ minWidth: "100%", width: "100%", boxSizing: "border-box", padding: "0 2px" }}>
               <CardBody t={t} config={config} />
             </div>
           ))}
         </div>
 
+        {/* Prev / Next arrows — only show if more than 1 item */}
         {items.length > 1 && (
           <>
             <button
+              aria-label="Previous"
               onClick={prev}
               style={{
-                position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
-                width: 32, height: 32, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.9)",
+                position: "absolute", left: 4, top: "50%", transform: "translateY(-50%)",
+                width: 30, height: 30, borderRadius: "50%", border: "none",
+                background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.15)", zIndex: 2, fontSize: 16, lineHeight: 1, color: "#333",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.18)", zIndex: 2, fontSize: 18, lineHeight: 1, color: "#333",
               }}
             >
-              &#8249;
+              ‹
             </button>
             <button
+              aria-label="Next"
               onClick={next}
               style={{
-                position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-                width: 32, height: 32, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.9)",
+                position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)",
+                width: 30, height: 30, borderRadius: "50%", border: "none",
+                background: "rgba(255,255,255,0.92)", backdropFilter: "blur(4px)",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.15)", zIndex: 2, fontSize: 16, lineHeight: 1, color: "#333",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.18)", zIndex: 2, fontSize: 18, lineHeight: 1, color: "#333",
               }}
             >
-              &#8250;
+              ›
             </button>
           </>
         )}
       </div>
 
+      {/* Dot indicators */}
       {items.length > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
           {items.map((_, i) => (
             <button
               key={i}
+              aria-label={`Go to slide ${i + 1}`}
               onClick={() => goTo(i)}
               style={{
-                width: 8, height: 8, borderRadius: "50%", border: "none", cursor: "pointer", padding: 0,
-                background: i === index ? s.accentColor : "#d1d5db", transition: "background 0.3s",
+                width: i === index ? 20 : 8,
+                height: 8, borderRadius: 4, border: "none", cursor: "pointer", padding: 0,
+                background: i === index ? s.accentColor : "#d1d5db",
+                transition: "all 0.3s ease",
               }}
             />
           ))}
