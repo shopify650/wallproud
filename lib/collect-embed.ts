@@ -152,11 +152,11 @@ sh.innerHTML='<style>'
 +'<textarea class="wp-field wp-textarea" id="ct" placeholder="'+PL+'" rows="4" maxlength="'+MX+'"></textarea>'
 +'</div>'
 +'<div class="wp-char"><span id="cc">0</span> / '+MX+'</div>'
-+(SN?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><input class="wp-field" id="nm" placeholder="Your name" '+(NR?'required':'')+' /></div>':'')
-+(SE?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div><input class="wp-field" id="em" type="email" placeholder="Email" '+(ER?'required':'')+' /></div>':'')
-+(SC?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><input class="wp-field" id="co" placeholder="Company" '+(CR?'required':'')+' /></div>':'')
-+(SP?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><input class="wp-field" id="ph" type="tel" placeholder="Phone" '+(PR?'required':'')+' /></div>':'')
-+(SV?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div><input class="wp-field" id="vi" type="url" placeholder="Video URL" /></div>':'')
++(SN?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><input class="wp-field" id="nm" placeholder="Your name" maxlength="100" '+(NR?'required':'')+' /></div>':'')
++(SE?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div><input class="wp-field" id="em" type="email" placeholder="Email" maxlength="255" '+(ER?'required':'')+' /></div>':'')
++(SC?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><input class="wp-field" id="co" placeholder="Company" maxlength="100" '+(CR?'required':'')+' /></div>':'')
++(SP?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><input class="wp-field" id="ph" type="tel" placeholder="Phone" maxlength="30" '+(PR?'required':'')+' /></div>':'')
++(SV?'<div class="wp-field-group"><div class="wp-field-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div><input class="wp-field" id="vi" type="url" placeholder="Video URL" maxlength="500" /></div>':'')
 +'<button type="submit" class="wp-submit" id="sb">Submit Testimonial</button>'
 +'<div class="wp-err" id="er"></div>'
 +'</form>'
@@ -247,13 +247,26 @@ if(fm)fm.addEventListener('submit',function(e){
 e.preventDefault();
 var el=$('er');if(el)el.style.display='none';
 var cv=(ct?ct.value:'').trim();
-if(cv.length<MN){if(el){el.textContent='Minimum '+MN+' characters';el.style.display='block'}return}
-if(cv.length>MX){if(el){el.textContent='Maximum '+MX+' characters';el.style.display='block'}return}
+if(cv.length<MN){if(el){el.textContent='Minimum '+MN+' characters required';el.style.display='block'}return}
+if(cv.length>MX){if(el){el.textContent='Maximum '+MX+' characters allowed';el.style.display='block'}return}
+
+var nv=SN?($('nm')?$('nm').value.trim():''):'';
+if(SN&&NR&&!nv){if(el){el.textContent='Name is required';el.style.display='block'}return}
+
+var ev=SE?($('em')?$('em').value.trim():''):'';
+if(SE&&ER&&!ev){if(el){el.textContent='Email is required';el.style.display='block'}return}
+
+var cov=SC?($('co')?$('co').value.trim():''):'';
+if(SC&&CR&&!cov){if(el){el.textContent='Company is required';el.style.display='block'}return}
+
+var pv=SP?($('ph')?$('ph').value.trim():''):'';
+if(SP&&PR&&!pv){if(el){el.textContent='Phone is required';el.style.display='block'}return}
+
 var sb=$('sb');if(sb){sb.disabled=true;sb.textContent='Submitting...'}
 var b={widgetId:WID,content:cv,rating:rg,pageUrl:window.location.href,referrer:document.referrer||''};
-${w.show_name ? `b.authorName=($('nm')?$('nm').value:'').trim();` : ''}
-${w.show_email ? `b.authorEmail=($('em')?$('em').value:'').trim();` : ''}
-${w.show_company ? `b.authorCompany=($('co')?$('co').value:'').trim();` : ''}
+if(SN&&nv)b.authorName=nv;
+if(SE&&ev)b.authorEmail=ev;
+if(SC&&cov)b.authorCompany=cov;
 fetch(API+'/api/collect/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
 .then(function(r){return r.json()}).then(function(d){
 if(d.success){

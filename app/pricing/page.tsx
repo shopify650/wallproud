@@ -1,219 +1,85 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { createClient } from "@/lib/supabase/client";
-
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "/mo",
-    description: "Everything you need to start collecting testimonials.",
-    features: [
-      "Up to 10 testimonials",
-      "1 collection link",
-      "1 widget",
-      "1 import source",
-      "1 workspace",
-      "1 team member",
-      "Embeddable widget scripts",
-    ],
-    cta: "Get started",
-    href: "/signup",
-    highlighted: false,
-    planKey: null,
-  },
-  {
-    name: "Pro",
-    price: "$19",
-    period: "/mo",
-    description: "For teams that live on social proof.",
-    features: [
-      "Up to 2,500 testimonials",
-      "20 collection links",
-      "20 widgets",
-      "10 import sources",
-      "      3 workspaces",
-      "3 team members (soon)",
-      "Remove branding",
-      "Advanced analytics",
-      "Priority support",
-      "AI tagging & insights (soon)",
-    ],
-    cta: "Start free trial",
-    href: "/signup",
-    highlighted: true,
-    planKey: "pro",
-  },
-  {
-    name: "Agency",
-    price: "$99",
-    period: "/mo",
-    description: "For agencies managing multiple clients.",
-    features: [
-      "Up to 25,000 testimonials",
-      "100 collection links",
-      "100 widgets",
-      "50 import sources",
-      "      15 workspaces",
-      "15 team members (soon)",
-      "White-label option",
-      "Advanced analytics",
-      "Dedicated support",
-      "AI tagging & insights (soon)",
-    ],
-    cta: "Contact us",
-    href: "/signup",
-    highlighted: false,
-    planKey: "agency",
-  },
-];
+import { PricingSection } from "@/components/PricingSection";
+import { ArrowRight, HelpCircle } from "lucide-react";
 
 export default function PricingPage() {
-  const router = useRouter();
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-
-  const handleCheckout = async (planKey: string | null) => {
-    if (!planKey) {
-      router.push("/signup");
-      return;
-    }
-
-    setLoadingPlan(planKey);
-
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/signup");
-        return;
-      }
-
-      const res = await fetch("/api/whop/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planKey }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.url) {
-        throw new Error(data.error || "Failed to start checkout");
-      }
-
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Checkout error:", error);
-      setLoadingPlan(null);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-canvas text-ink">
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-30">
-        <svg className="absolute -right-40 -top-40 h-96 w-96 text-surface-1" viewBox="0 0 200 200" fill="none">
-          <circle cx="100" cy="100" r="80" stroke="currentColor" strokeOpacity={0.4} strokeWidth={2} />
-          <circle cx="100" cy="100" r="50" stroke="currentColor" strokeOpacity={0.2} strokeWidth={1} />
-        </svg>
-        <svg className="absolute -bottom-20 -left-20 h-64 w-64 text-surface-1" viewBox="0 0 200 200" fill="none">
-          <rect x="20" y="20" width="160" height="160" rx="30" stroke="currentColor" strokeOpacity={0.3} strokeWidth={1.5} />
-          <rect x="40" y="40" width="120" height="120" rx="20" stroke="currentColor" strokeOpacity={0.15} strokeWidth={1} />
-        </svg>
+    <div className="min-h-screen bg-black text-ink selection:bg-accent/30 selection:text-white overflow-x-hidden relative">
+      {/* Background ambient glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-[#0099ff]/[0.06] blur-[140px]" />
+        <div className="absolute top-[30%] right-[-5%] h-[400px] w-[500px] rounded-full bg-[#6a4cf5]/[0.05] blur-[120px]" />
       </div>
 
-      <header className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+      {/* Navigation */}
+      <header className="sticky top-0 z-50 border-b border-white/[0.04] bg-canvas/70 backdrop-blur-xl transition-all duration-300">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo />
-        <nav className="flex items-center gap-3">
-          <Link href="/login" className="btn-secondary text-sm">
-            Sign in
-          </Link>
-          <Link href="/signup" className="btn-primary text-sm">
-            Get started free
-          </Link>
-        </nav>
+          <nav className="flex items-center gap-6">
+            <Link href="/" className="text-[14px] font-medium text-muted transition hover:text-white">
+              Home
+            </Link>
+            <Link href="/login" className="text-[14px] font-medium text-muted transition hover:text-white">
+              Sign in
+            </Link>
+            <Link
+              href="/signup"
+              className="relative inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-[14px] font-semibold text-black transition-all duration-200 hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-white/5"
+            >
+              Get started
+            </Link>
+          </nav>
+        </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 pb-28 pt-14">
-        <div className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-pill bg-surface-1 px-3 py-1 text-[13px] tracking-tight text-muted">
-            <Sparkles className="h-3 w-3" /> Simple, transparent pricing
-          </span>
-          <h1 className="font-display-xl mt-6 text-ink">
-            Pick the plan that fits
-          </h1>
-          <p className="font-body-lg mx-auto mt-3 max-w-2xl text-muted">
-            Start free. Upgrade when you&apos;re ready to scale your social proof.
-          </p>
-        </div>
+      {/* Main Content */}
+      <main className="relative z-10 pt-8 pb-20">
+        <PricingSection showTitle={true} />
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative flex flex-col rounded-[20px] p-8 ${
-                plan.highlighted
-                  ? "bg-surface-2 ring-1 ring-white/10"
-                  : "card-hairline"
-              }`}
-            >
-              {plan.highlighted && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-pill bg-white px-4 py-1 font-caption text-black">
-                  Popular
-                </span>
-              )}
-              <div className="flex items-center justify-between">
-                <h2 className="font-display-md text-ink">{plan.name}</h2>
-              </div>
-              <p className="font-body mt-1 text-muted">{plan.description}</p>
-              <div className="mt-5 flex items-baseline gap-1">
-                <span className="font-display-xl text-ink">{plan.price}</span>
-                <span className="font-body text-muted">{plan.period}</span>
-              </div>
-
-              <ul className="mt-6 flex-1 space-y-3">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3">
-                    <Check className="h-4 w-4 shrink-0 text-accent" />
-                    <span className="font-body-sm text-ink">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => handleCheckout(plan.planKey)}
-                disabled={loadingPlan === plan.planKey}
-                className={`mt-8 flex items-center justify-center gap-2 rounded-pill px-4 py-2.5 font-body-sm transition ${
-                  plan.highlighted ? "btn-primary" : "btn-secondary"
-                } ${loadingPlan === plan.planKey ? "opacity-70" : ""}`}
+        {/* Custom enterprise / agency section */}
+        <div className="mx-auto max-w-4xl px-6 mt-8">
+          <div className="rounded-3xl border border-white/[0.08] bg-gradient-to-b from-surface-1/60 to-surface-1/20 p-8 md:p-12 text-center backdrop-blur-md shadow-2xl relative overflow-hidden">
+            <div className="absolute -right-20 -bottom-20 h-40 w-40 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+            
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-accent">
+              <HelpCircle className="h-3.5 w-3.5" /> High volume or Enterprise?
+            </span>
+            <h3 className="mt-4 font-display-md text-2xl text-white">Need white-label SLA or custom integration?</h3>
+            <p className="mt-2 text-sm text-muted/80 max-w-lg mx-auto">
+              We offer custom contract terms, tailored API limits, dedicated solutions engineers, and direct Slack support for high-scale teams.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-bold text-black transition-all hover:bg-white/90 hover:scale-105"
               >
-                {loadingPlan === plan.planKey ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Redirecting...
-                  </>
-                ) : (
-                  <>
-                    {plan.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
+                Talk to Sales <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
-          ))}
+          </div>
         </div>
-
-        <p className="mt-12 text-center font-body text-muted">
-          Need something custom?{" "}
-          <Link href="/login" className="font-body-sm text-accent hover:underline">
-            Talk to us
-          </Link>
-        </p>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 mx-auto max-w-6xl px-6 pb-12">
+        <div className="flex flex-col items-center justify-between gap-6 border-t border-white/[0.06] pt-8 sm:flex-row">
+          <Logo />
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-muted">
+            <Link href="/" className="transition hover:text-white">Home</Link>
+            <Link href="/docs" className="transition hover:text-white">Docs</Link>
+            <Link href="/blog" className="transition hover:text-white">Blog</Link>
+            <Link href="/changelog" className="transition hover:text-white">Changelog</Link>
+            <Link href="/login" className="transition hover:text-white">Log in</Link>
+            <Link href="/signup" className="transition hover:text-white">Sign up</Link>
+            <Link href="/terms" className="transition hover:text-white">Terms</Link>
+            <Link href="/privacy" className="transition hover:text-white">Privacy</Link>
+          </div>
+          <p className="text-xs text-muted">&copy; {new Date().getFullYear()} WallProud. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }

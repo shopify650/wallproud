@@ -48,6 +48,9 @@ const upsertSchema = z.object({
   show_powered_by: z.boolean().default(true),
   auto_approve_5star: z.boolean().default(false),
   is_active: z.boolean().default(true),
+}).refine((data) => data.min_characters <= data.max_characters, {
+  message: "Minimum character limit cannot exceed maximum character limit",
+  path: ["min_characters"],
 });
 
 export type CollectWidgetFormData = z.infer<typeof upsertSchema>;

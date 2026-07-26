@@ -430,6 +430,7 @@ export default function CollectForm({
                 </label>
                 <input
                   type="text"
+                  maxLength={100}
                   required={fieldConfig.name_required}
                   value={form.author_name}
                   onChange={(e) => update("author_name", e.target.value)}
@@ -446,6 +447,7 @@ export default function CollectForm({
                   </label>
                   <input
                     type="text"
+                    maxLength={100}
                     required={fieldConfig.company_required}
                     value={form.author_company}
                     onChange={(e) => update("author_company", e.target.value)}
@@ -461,6 +463,7 @@ export default function CollectForm({
                   </label>
                   <input
                     type="text"
+                    maxLength={100}
                     required={fieldConfig.role_required}
                     value={form.author_role}
                     onChange={(e) => update("author_role", e.target.value)}
@@ -477,6 +480,7 @@ export default function CollectForm({
                 </label>
                 <input
                   type="email"
+                  maxLength={255}
                   required={fieldConfig.email_required}
                   value={form.author_email}
                   onChange={(e) => update("author_email", e.target.value)}

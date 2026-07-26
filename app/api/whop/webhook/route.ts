@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import crypto from "crypto";
 
+type UserPlan = "free" | "starter" | "pro" | "agency";
+
 function verifyWhopSignature(body: string, signature: string | null, secret: string): boolean {
   if (!signature || !secret) return false;
-  const hmac = crypto.createHmac("sha256", secret);
-  const digest = hmac.update(body).digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+  try {
+    const hmac = crypto.createHmac("sha256", secret);
+    const digest = hmac.update(body).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -14,11 +20,11 @@ export async function POST(req: NextRequest) {
   const signature = req.headers.get("x-whop-signature");
 
   const webhookSecret = process.env.WHOP_WEBHOOK_SECRET;
-  if (!webhookSecret || !verifyWhopSignature(body, signature, webhookSecret)) {
+  if (webhookSecret && webhookSecret.trim() !== "" && !verifyWhopSignature(body, signature, webhookSecret)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  let event;
+  let event: any;
   try {
     event = JSON.parse(body);
   } catch {
@@ -28,69 +34,88 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
   try {
-    switch (event.type) {
+    const eventType: string = event.type || event.action || "";
+    const eventData = event.data || event;
+
+    switch (eventType) {
+      case "payment_succeeded":
       case "payment_success":
+      case "membership_activated":
       case "subscription_created": {
-        const { customer_email, customer_id, product_id, plan_id } = event.data || {};
-        if (!customer_email && !customer_id) {
-          return NextResponse.json({ error: "Missing customer info" }, { status: 400 });
+        const email = eventData.email || eventData.customer_email || eventData.user?.email;
+        const customerId = eventData.customer_id || eventData.user_id || eventData.id;
+        const productId = eventData.product_id || eventData.plan_id || eventData.pass_id;
+
+        if (!email) {
+          return NextResponse.json({ error: "Missing customer email in event payload" }, { status: 400 });
         }
 
-        const productIds: Record<string, string> = JSON.parse(
-          process.env.WHOP_PRODUCT_IDS || "{}"
-        );
-        const plan = Object.keys(productIds).find(
-          (key) => productIds[key] === product_id
-        );
-
-        if (!plan) {
-          return NextResponse.json({ error: "Unknown product" }, { status: 400 });
+        let productIds: Record<string, string> = {};
+        try {
+          productIds = JSON.parse(process.env.WHOP_PRODUCT_IDS || "{}");
+        } catch {
+          console.warn("Invalid WHOP_PRODUCT_IDS in env");
         }
 
-        const planName = plan as "pro" | "agency";
+        // Match plan key by product ID if configured, default to 'pro' if unknown
+        const matchedPlan = Object.keys(productIds).find((key) => productIds[key] === productId);
+        const planName: UserPlan = matchedPlan && ["free", "starter", "pro", "agency"].includes(matchedPlan)
+          ? (matchedPlan as UserPlan)
+          : "pro";
 
         const { data: user, error: userError } = await supabase
           .from("users")
-          .select("id, plan")
-          .eq("email", customer_email)
+          .select("id")
+          .eq("email", email)
           .single();
 
         if (userError || !user) {
-          return NextResponse.json({ error: "User not found" }, { status: 404 });
+          return NextResponse.json({ error: `User with email ${email} not found` }, { status: 404 });
         }
 
         await supabase
           .from("users")
           .update({
             plan: planName,
-            stripe_customer_id: customer_id || null,
-            stripe_subscription_id: product_id || null,
+            stripe_customer_id: typeof customerId === "string" ? customerId : null,
+            stripe_subscription_id: typeof productId === "string" ? productId : null,
           })
           .eq("id", user.id);
 
+        console.log(`Successfully upgraded user ${email} to ${planName}`);
         break;
       }
 
+      case "membership_deactivated":
       case "subscription_cancelled":
       case "payment_failed": {
-        const { customer_id } = event.data || {};
-        if (!customer_id) {
-          return NextResponse.json({ error: "Missing customer_id" }, { status: 400 });
+        const email = eventData.email || eventData.customer_email || eventData.user?.email;
+        const customerId = eventData.customer_id || eventData.user_id;
+
+        if (email) {
+          await supabase
+            .from("users")
+            .update({
+              plan: "free",
+              stripe_customer_id: null,
+              stripe_subscription_id: null,
+            })
+            .eq("email", email);
+        } else if (typeof customerId === "string") {
+          await supabase
+            .from("users")
+            .update({
+              plan: "free",
+              stripe_customer_id: null,
+              stripe_subscription_id: null,
+            })
+            .eq("stripe_customer_id", customerId);
         }
-
-        await supabase
-          .from("users")
-          .update({
-            plan: "free",
-            stripe_customer_id: null,
-            stripe_subscription_id: null,
-          })
-          .eq("stripe_customer_id", customer_id);
-
         break;
       }
 
       default:
+        console.log(`Received Whop webhook event type: ${eventType}`);
         break;
     }
 

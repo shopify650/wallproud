@@ -288,18 +288,23 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
                     <textarea
                       rows={3}
                       value={content}
+                      maxLength={form.max_characters}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder={form.placeholder}
                       className="w-full rounded-xl border border-gray-200 p-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
-                    <div className="mt-0.5 text-right text-[10px] text-gray-400">
-                      {content.length} / {form.max_characters}
+                    <div className="mt-0.5 flex justify-between text-[10px] text-gray-400">
+                      <span>Min: {form.min_characters}</span>
+                      <span className={content.length < form.min_characters ? "text-red-500 font-medium" : ""}>
+                        {content.length} / {form.max_characters}
+                      </span>
                     </div>
                   </div>
 
                   {form.show_name && (
                     <input
                       type="text"
+                      maxLength={100}
                       placeholder={`Your name${form.name_required ? " *" : ""}`}
                       className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
@@ -308,6 +313,7 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
                   {form.show_email && (
                     <input
                       type="email"
+                      maxLength={255}
                       placeholder={`Email${form.email_required ? " *" : ""}`}
                       className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
@@ -316,6 +322,7 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
                   {form.show_company && (
                     <input
                       type="text"
+                      maxLength={100}
                       placeholder={`Company${form.company_required ? " *" : ""}`}
                       className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
@@ -324,6 +331,7 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
                   {form.show_phone && (
                     <input
                       type="tel"
+                      maxLength={30}
                       placeholder={`Phone${form.phone_required ? " *" : ""}`}
                       className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
@@ -332,6 +340,7 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
                   {form.show_video && (
                     <input
                       type="url"
+                      maxLength={500}
                       placeholder="Video URL"
                       className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs text-gray-900 placeholder-gray-400 outline-none focus:border-accent"
                     />
@@ -339,7 +348,13 @@ function OnSiteWidgetPreview({ form }: { form: FormState }) {
 
                   <button
                     type="button"
-                    onClick={() => setSubmitted(true)}
+                    onClick={() => {
+                      if (content.trim().length < form.min_characters) {
+                        toast.error(`Minimum ${form.min_characters} characters required`);
+                        return;
+                      }
+                      setSubmitted(true);
+                    }}
                     style={{ backgroundColor: form.primary_color }}
                     className="w-full rounded-xl py-2.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:scale-[0.99]"
                   >

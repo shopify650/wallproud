@@ -22,6 +22,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { PricingSection } from "@/components/PricingSection";
 
 const stats = [
   ["12,847+", "Testimonials collected"],
@@ -729,6 +730,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* ---- Pricing ---- */}
+      <PricingSection />
 
       {/* ---- FAQ ---- */}
       <section className="relative z-10 mx-auto max-w-3xl px-6 pb-28">
