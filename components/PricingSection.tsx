@@ -271,14 +271,18 @@ export function PricingSection({ showTitle = true, compactHeader = false }: Pric
                 <p className="mt-2 text-xs leading-relaxed text-muted/80 min-h-[36px]">{plan.description}</p>
 
                 {/* Price Display */}
-                <div className="mt-6 flex items-baseline gap-1.5 border-b border-white/[0.06] pb-6">
-                  <span className="font-display-xl text-4xl text-white font-bold tracking-tight">${price}</span>
-                  <span className="text-sm font-medium text-muted">/month</span>
-                  {billingCycle === "yearly" && price > 0 && (
-                    <span className="ml-auto text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                      Billed annually
-                    </span>
-                  )}
+                <div className="mt-6 border-b border-white/[0.06] pb-6">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-display-xl text-3xl sm:text-4xl text-white font-bold tracking-tight">${price}</span>
+                      <span className="text-xs sm:text-sm font-medium text-muted">/month</span>
+                    </div>
+                    {billingCycle === "yearly" && price > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold text-emerald-400 border border-emerald-500/20 whitespace-nowrap shrink-0">
+                        Billed annually
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Feature List */}
