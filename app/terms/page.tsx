@@ -77,7 +77,7 @@ export default function TermsPage() {
             <h2 className="font-display-md mb-3 text-ink">9. Contact</h2>
             <p>
               For questions about these terms, contact us at{" "}
-              <a href="mailto:support@wallproud.com" className="text-accent hover:underline">support@wallproud.com</a>.
+              <a href="https://whop.com/dashboard/biz_MVS9CXdh2WXcFG/support/" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">support@wallproud.com</a>.
             </p>
           </section>
         </div>

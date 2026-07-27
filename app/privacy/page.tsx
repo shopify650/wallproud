@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <h2 className="font-display-md mb-3 text-ink">10. Contact</h2>
             <p>
               For privacy-related inquiries, contact us at{" "}
-              <a href="mailto:support@wallproud.com" className="text-accent hover:underline">support@wallproud.com</a>.
+              <a href="https://whop.com/dashboard/biz_MVS9CXdh2WXcFG/support/" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">support@wallproud.com</a>.
             </p>
           </section>
         </div>
