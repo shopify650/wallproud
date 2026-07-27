@@ -702,7 +702,6 @@ export default function CollectWidgetClient({
                 ["Company", "show_company"],
                 ["Phone", "show_phone"],
                 ["Video URL", "show_video"],
-                ["Image", "show_image"],
               ] as const).map(([label, key]) => (
                 <div key={key}>
                   <label className="flex items-center justify-between py-1">
