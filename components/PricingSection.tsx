@@ -121,7 +121,7 @@ const featureComparison = [
 export function PricingSection({ showTitle = true, compactHeader = false }: PricingSectionProps) {
   const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<string>("");
   const [showComparison, setShowComparison] = useState(false);
 
   const handleCheckout = async (planKey: string | null) => {
@@ -160,7 +160,7 @@ export function PricingSection({ showTitle = true, compactHeader = false }: Pric
       console.error("Checkout error:", error);
       // Fall back to signup page if checkout endpoint is unconfigured or errors out
       router.push("/signup");
-      setLoadingPlan(null);
+      setLoadingPlan("");
     }
   };
 
