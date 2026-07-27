@@ -59,6 +59,7 @@ export default async function DashboardLayout({
       .from("workspaces")
       .insert({
         name: "My Workspace",
+        slug: `workspace-${authUser.id.slice(0, 8)}`,
         user_id: authUser.id,
         primary_color: "#000000",
       })
