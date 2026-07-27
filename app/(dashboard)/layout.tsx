@@ -51,11 +51,26 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const workspaces = workspacesResult.data || [];
+  let workspaces = workspacesResult.data || [];
   let activeWorkspace = workspaces.find(w => w.id === activeWorkspaceId) || workspaces[0] || null;
 
   if (!activeWorkspace && workspaces.length === 0) {
-    redirect("/login");
+    const { data: newWorkspace } = await supabase
+      .from("workspaces")
+      .insert({
+        name: "My Workspace",
+        user_id: authUser.id,
+        primary_color: "#000000",
+      })
+      .select()
+      .single();
+
+    if (newWorkspace) {
+      activeWorkspace = newWorkspace;
+      workspaces = [newWorkspace];
+    } else {
+      redirect("/login");
+    }
   }
 
   const planLimits = getPlanLimits((profile.plan as any) || "free");
