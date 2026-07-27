@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { plan } = body;
+    const { plan, cycle = "monthly" } = body;
 
     const validPlans = ["pro", "agency"];
     if (!validPlans.includes(plan)) {
@@ -27,11 +27,13 @@ export async function POST(req: NextRequest) {
       console.warn("Invalid WHOP_PRODUCT_IDS JSON in environment variables.");
     }
 
-    const productId = productIds[plan];
+    const planCycleKey = `${plan}_${cycle}`;
+    const productId = productIds[planCycleKey] || productIds[plan];
+    
     if (!productId || productId.trim() === "") {
       return NextResponse.json(
         {
-          error: `Whop Product ID for plan "${plan}" is not configured in .env.local yet. Please update WHOP_PRODUCT_IDS.`,
+          error: `Whop Product ID for plan "${plan}" (${cycle}) is not configured in .env.local yet. Please update WHOP_PRODUCT_IDS.`,
           unconfigured: true,
         },
         { status: 400 }
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     // Construct Whop checkout URL. If productId is already a full URL, use it directly.
     const checkoutUrl = productId.startsWith("http")
-      ? `${productId}?email=${encodeURIComponent(user.email || "")}`
+      ? `${productId}${productId.includes("?") ? "&" : "?"}email=${encodeURIComponent(user.email || "")}`
       : `https://whop.com/checkout/${productId}?email=${encodeURIComponent(user.email || "")}`;
 
     return NextResponse.json({ url: checkoutUrl });

@@ -76,10 +76,10 @@ const plans = [
       "Dedicated account manager",
       "AI sentiment & video transcribing (soon)",
     ],
-    cta: "Get Agency plan",
+    cta: "Available Soon",
     href: "/signup",
     highlighted: false,
-    planKey: "agency",
+    planKey: null,
   },
 ];
 
