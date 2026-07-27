@@ -44,7 +44,7 @@ export async function GET(
 
   if (!widget) {
     return new Response("console.warn('WallProud: widget not found');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=30", ...corsHeaders },
     });
   }
 
@@ -67,7 +67,7 @@ export async function GET(
 
   if (!testimonials || testimonials.length === 0) {
     return new Response("console.warn('WallProud: no testimonials to display');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=30", ...corsHeaders },
     });
   }
 
@@ -78,7 +78,7 @@ export async function GET(
 
   if (!script) {
     return new Response("console.warn('WallProud: no approved testimonials');", {
-      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=60, s-maxage=300", ...corsHeaders },
+      headers: { "Content-Type": "application/javascript", "Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=30", ...corsHeaders },
     });
   }
 
@@ -89,7 +89,7 @@ export async function GET(
   return new Response(script, {
     headers: {
       "Content-Type": "application/javascript",
-      "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+      "Cache-Control": "public, max-age=10, s-maxage=15, stale-while-revalidate=30",
       ...corsHeaders,
     },
   });

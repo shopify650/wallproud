@@ -33,7 +33,7 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": "application/javascript",
-        "Cache-Control": "public, s-maxage=60, max-age=60, stale-while-revalidate=300",
+        "Cache-Control": "public, s-maxage=15, max-age=10, stale-while-revalidate=30",
         "Access-Control-Allow-Origin": "*",
       },
     });
