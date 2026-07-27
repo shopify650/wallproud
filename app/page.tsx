@@ -318,12 +318,11 @@ export default function Home() {
             <div className="h-1.5 w-1.5 rounded-full bg-accent animate-ping" />
           </motion.div>
 
-          {/* Heading */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-8 max-w-5xl font-display-xxl leading-[0.9] tracking-tight bg-gradient-to-b from-white via-white to-white/45 bg-clip-text text-transparent pb-3"
+            className="mt-8 max-w-5xl font-display-xl leading-[0.9] tracking-tight bg-gradient-to-b from-white via-white to-white/45 bg-clip-text text-transparent pb-3"
           >
             Turn your best customers
             <br />
