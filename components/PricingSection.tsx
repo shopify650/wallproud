@@ -9,7 +9,6 @@ import { createClient } from "@/lib/supabase/client";
 
 interface PricingSectionProps {
   showTitle?: boolean;
-  compactHeader?: boolean;
 }
 
 const plans = [
@@ -118,7 +117,7 @@ const featureComparison = [
   },
 ];
 
-export function PricingSection({ showTitle = true, compactHeader = false }: PricingSectionProps) {
+export function PricingSection({ showTitle = true }: PricingSectionProps) {
   const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [loadingPlan, setLoadingPlan] = useState<string>("");
@@ -152,14 +151,17 @@ export function PricingSection({ showTitle = true, compactHeader = false }: Pric
       const data = await res.json();
 
       if (!res.ok || !data.url) {
-        throw new Error(data.error || "Failed to start checkout");
+        const message = data.error || "Failed to start checkout";
+        console.error("Checkout error:", message);
+        alert(message);
+        setLoadingPlan("");
+        return;
       }
 
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch (error) {
       console.error("Checkout error:", error);
-      // Fall back to signup page if checkout endpoint is unconfigured or errors out
-      router.push("/signup");
+      alert("Checkout failed. Please try again or contact support.");
       setLoadingPlan("");
     }
   };

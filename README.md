@@ -23,7 +23,12 @@ Wallproud is a minimalist, Framer-inspired testimonial and on-site collection wi
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   WHOP_PRODUCT_IDS={"pro_monthly":"your-whop-product-id","pro_yearly":"your-whop-product-id","agency_monthly":"your-whop-product-id"}
+   WHOP_WEBHOOK_SECRET=your-whop-webhook-secret
    ```
+
+   - `WHOP_PRODUCT_IDS` must include the product IDs used by Whop for each plan and cycle.
+   - If a plan is configured with a direct Whop checkout URL, put that URL as the value instead of a product ID.
 
 3. Run the development server:
    ```bash
